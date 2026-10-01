@@ -76,19 +76,33 @@ app.get('/index.html', requireAdminAuth, (req, res) => {
 });
 
 // Helper to construct UPI URI and QR Data URL
-async function generatePaymentQr(upiId, payeeName, amount, note) {
+async function generatePaymentQr(upiId, payeeName, amount, note, merchantOptions = {}) {
   try {
-    const cleanUpi = (upiId || 'himanshu1461@ptyes').trim();
-    // Official bank registration name with verified spacing (matches YES Bank records)
-    const cleanPayee = (payeeName || 'HIMANSHU  WALIA').trim();
+    const isMerchant = merchantOptions.accountType === 'merchant' && Boolean(merchantOptions.merchantUpiId);
+    const cleanUpi = (isMerchant ? merchantOptions.merchantUpiId : (upiId || 'himanshu1461@ptyes')).trim();
+    // Official bank / merchant registration name
+    const cleanPayee = (isMerchant 
+      ? (merchantOptions.merchantBusinessName || 'RAM RAM JI TRANSPORT') 
+      : (payeeName || 'HIMANSHU  WALIA')
+    ).trim();
     const cleanAmount = Number(amount || 0).toFixed(2);
     const cleanNote = (note || 'School Bus Fee').replace(/[^a-zA-Z0-9 -]/g, ' ').substring(0, 50);
 
-    // 1. Official Verified Bank URI (Matches original bank scanner exactly - zero risk alerts in GPay/PhonePe)
-    const cleanBankUri = `upi://pay?pa=${encodeURIComponent(cleanUpi)}&pn=${encodeURIComponent(cleanPayee)}`;
+    let cleanBankUri = '';
+    let dynamicUri = '';
 
-    // 2. Dynamic URI with pre-filled amount
-    const dynamicUri = `upi://pay?pa=${encodeURIComponent(cleanUpi)}&pn=${encodeURIComponent(cleanPayee)}&am=${cleanAmount}&cu=INR&tn=${encodeURIComponent(cleanNote)}`;
+    if (isMerchant) {
+      const mcc = (merchantOptions.merchantMcc || '4111').trim();
+      // NPCI P2M Merchant format:
+      // Includes mc (Merchant Category Code), mode=02 (Secure Merchant Dynamic QR), purpose=00
+      cleanBankUri = `upi://pay?pa=${encodeURIComponent(cleanUpi)}&pn=${encodeURIComponent(cleanPayee)}&mc=${encodeURIComponent(mcc)}&mode=02&purpose=00`;
+      dynamicUri = `upi://pay?pa=${encodeURIComponent(cleanUpi)}&pn=${encodeURIComponent(cleanPayee)}&mc=${encodeURIComponent(mcc)}&mode=02&purpose=00&am=${cleanAmount}&cu=INR&tn=${encodeURIComponent(cleanNote)}`;
+    } else {
+      // 1. Official Verified Bank URI (Matches original bank scanner exactly - zero risk alerts in GPay/PhonePe)
+      cleanBankUri = `upi://pay?pa=${encodeURIComponent(cleanUpi)}&pn=${encodeURIComponent(cleanPayee)}`;
+      // 2. Dynamic URI with pre-filled amount
+      dynamicUri = `upi://pay?pa=${encodeURIComponent(cleanUpi)}&pn=${encodeURIComponent(cleanPayee)}&am=${cleanAmount}&cu=INR&tn=${encodeURIComponent(cleanNote)}`;
+    }
 
     // Generate Official Clean QR code
     const cleanQrDataUrl = await QRCode.toDataURL(cleanBankUri, {
@@ -119,7 +133,10 @@ async function generatePaymentQr(upiId, payeeName, amount, note) {
       qrDataUrl: cleanQrDataUrl,
       cleanQrDataUrl,
       dynamicQrDataUrl,
-      officialScannerImage: '/scanner.png'
+      officialScannerImage: '/scanner.png',
+      isMerchant: Boolean(isMerchant),
+      mcc: isMerchant ? (merchantOptions.merchantMcc || '4111') : null,
+      provider: isMerchant ? (merchantOptions.merchantProvider || 'Paytm for Business') : null
     };
   } catch (err) {
     console.error('QR generation error:', err);
@@ -367,11 +384,25 @@ app.get('/api/pay/:token', async (req, res) => {
 
     // Prepare payment note (includes exact target month being cleared!)
     const note = `Bus Fee ${combinedNames} ${student.busNumber} ${targetMonth}`.replace(/[^a-zA-Z0-9 -]/g, ' ').substring(0, 50);
+
+    const isMerchant = settings.accountType === 'merchant' && Boolean(settings.merchantUpiId);
+    const activeUpiId = isMerchant ? settings.merchantUpiId : (settings.upiId || 'himanshu1461@ptyes');
+    const activePayeeName = isMerchant 
+      ? (settings.merchantBusinessName || settings.businessName || 'RAM RAM JI TRANSPORT')
+      : (settings.upiPayeeName || 'HIMANSHU  WALIA');
+
     const qrInfo = await generatePaymentQr(
-      settings.upiId,
-      settings.upiPayeeName || 'HIMANSHU  WALIA',
+      activeUpiId,
+      activePayeeName,
       totalAmount,
-      note
+      note,
+      {
+        accountType: settings.accountType || 'merchant',
+        merchantUpiId: settings.merchantUpiId,
+        merchantBusinessName: settings.merchantBusinessName || settings.businessName,
+        merchantMcc: settings.merchantMcc || '4111',
+        merchantProvider: settings.merchantProvider || 'Paytm for Business'
+      }
     );
 
     const parentView = {
@@ -425,6 +456,13 @@ app.get('/api/pay/:token', async (req, res) => {
         ownerPhone: settings.ownerPhone,
         upiId: settings.upiId,
         upiPayeeName: settings.upiPayeeName,
+        accountType: settings.accountType || 'merchant',
+        merchantProvider: settings.merchantProvider || 'Paytm for Business',
+        merchantUpiId: settings.merchantUpiId || '',
+        merchantBusinessName: settings.merchantBusinessName || settings.businessName || 'RAM RAM JI TRANSPORT',
+        merchantMcc: settings.merchantMcc || '4111',
+        merchantMid: settings.merchantMid || '',
+        merchantVerified: settings.merchantVerified !== undefined ? settings.merchantVerified : true,
         bankName: settings.bankName || 'YES Bank',
         bankAccountName: settings.bankAccountName || 'HIMANSHU WALIA',
         bankAccountNumber: settings.bankAccountNumber || '14610100012345',
@@ -443,8 +481,14 @@ app.get('/api/pay/:token', async (req, res) => {
         dynamicQrDataUrl: qrInfo.dynamicQrDataUrl,
         scannerImage: settings.scannerImage || '/scanner.png',
         useCustomQr: !!settings.useCustomQr,
-        payeeName: settings.upiPayeeName || 'HIMANSHU  WALIA',
-        upiId: settings.upiId || 'himanshu1461@ptyes',
+        payeeName: activePayeeName,
+        upiId: activeUpiId,
+        isMerchantAccount: isMerchant,
+        accountType: settings.accountType || 'merchant',
+        merchantProvider: settings.merchantProvider || 'Paytm for Business',
+        merchantUpiId: settings.merchantUpiId || '',
+        merchantBusinessName: settings.merchantBusinessName || settings.businessName || 'RAM RAM JI TRANSPORT',
+        merchantMcc: settings.merchantMcc || '4111',
         bankName: settings.bankName || 'YES Bank',
         bankAccountName: settings.bankAccountName || 'HIMANSHU WALIA',
         bankAccountNumber: settings.bankAccountNumber || '14610100012345',

@@ -892,6 +892,95 @@ function populatePaymentStep(data) {
     if (document.getElementById('bankTransferAmountDisplay')) document.getElementById('bankTransferAmountDisplay').textContent = formattedAmount;
     if (document.getElementById('bankBranchDisplay')) document.getElementById('bankBranchDisplay').textContent = `Branch: ${bBranch}`;
 
+    // Setup Merchant vs Personal Details on Parent Portal
+    const payment = data.payment || {};
+    const settings = data.settings || {};
+    const isMerchant = Boolean(payment.isMerchantAccount || settings.accountType === 'merchant');
+    const provider = payment.merchantProvider || settings.merchantProvider || 'Paytm for Business';
+    const merchantBizName = payment.merchantBusinessName || settings.merchantBusinessName || settings.businessName || 'RAM RAM JI TRANSPORT';
+    const upiVpa = payment.upiId || settings.merchantUpiId || settings.upiId || 'paytmqr2810050501011@paytm';
+    const mcc = payment.merchantMcc || settings.merchantMcc || '4111';
+
+    // Update Advisory Banner
+    const advisoryTitle = document.getElementById('advisoryTitleText');
+    const advisoryBadge = document.getElementById('advisoryBadge');
+    const advisoryDesc = document.getElementById('advisoryDesc');
+
+    if (isMerchant) {
+      if (advisoryTitle) advisoryTitle.textContent = `100% Zero-Risk Payment (${provider})`;
+      if (advisoryBadge) {
+        advisoryBadge.textContent = '✓ Verified Merchant';
+        advisoryBadge.className = 'text-[9px] font-black bg-emerald-200 text-emerald-900 px-1.5 py-0.2 rounded-full';
+      }
+      if (advisoryDesc) {
+        advisoryDesc.innerHTML = `Official Commercial Merchant account for <strong>${escapeHtml(merchantBizName)}</strong> (MCC ${escapeHtml(mcc)}: Passenger Transport). Scan QR or tap below with zero risk policy warnings.`;
+      }
+    } else {
+      if (advisoryTitle) advisoryTitle.textContent = '100% Zero-Risk Payment';
+      if (advisoryBadge) {
+        advisoryBadge.textContent = '✓ Verified Payee';
+        advisoryBadge.className = 'text-[9px] font-black bg-blue-100 text-blue-900 px-1.5 py-0.2 rounded-full';
+      }
+      if (advisoryDesc) {
+        advisoryDesc.innerHTML = `Pay directly via <strong>Mobile Number (${settings.ownerPhone || '9814124392'})</strong> or <strong>Scan Official QR</strong> below to avoid app risk warnings.`;
+      }
+    }
+
+    // Update Option A Card
+    const optionATitle = document.getElementById('methodOptionAText');
+    const optionABadge = document.getElementById('methodOptionABadge');
+    const payeeLabel = document.getElementById('merchantPayeeLabel');
+    const verifiedPill = document.getElementById('merchantVerifiedPill');
+    const mobileDisplay = document.getElementById('mobileNumberDisplay');
+    const copyBtnText = document.getElementById('btnCopyMobileText');
+    const optionAFootnote = document.getElementById('methodOptionAFootnote');
+
+    if (isMerchant) {
+      if (optionATitle) optionATitle.textContent = 'Option A: Official Merchant VPA';
+      if (optionABadge) optionABadge.textContent = provider;
+      if (payeeLabel) payeeLabel.textContent = merchantBizName;
+      if (verifiedPill) verifiedPill.textContent = '✓ NPCI Merchant';
+      if (mobileDisplay) mobileDisplay.textContent = upiVpa;
+      if (copyBtnText) copyBtnText.textContent = '📋 Copy VPA';
+      if (optionAFootnote) {
+        optionAFootnote.textContent = `Official ${provider} account for ${merchantBizName}. Exempt from personal P2P risk checks.`;
+      }
+    } else {
+      if (optionATitle) optionATitle.textContent = 'Option A: Pay via Mobile No.';
+      if (optionABadge) optionABadge.textContent = 'Recommended';
+      if (payeeLabel) payeeLabel.textContent = settings.upiPayeeName || 'Himanshu Walia';
+      if (verifiedPill) verifiedPill.textContent = '✓ Linked on Paytm';
+      if (mobileDisplay) mobileDisplay.textContent = settings.ownerPhone || '9814124392';
+      if (copyBtnText) copyBtnText.textContent = '📋 Copy Mobile';
+      if (optionAFootnote) {
+        optionAFootnote.textContent = `Open Paytm, PhonePe or GPay, choose "To Mobile Number", paste ${settings.ownerPhone || '9814124392'} and enter fee. Shows verified name with 0 risk.`;
+      }
+    }
+
+    // Update Payee Box under QR
+    if (document.getElementById('portalPayeeName')) {
+      document.getElementById('portalPayeeName').textContent = `Payee: ${isMerchant ? merchantBizName : (settings.upiPayeeName || 'HIMANSHU  WALIA')}`;
+    }
+    if (document.getElementById('portalPayeeVpa')) {
+      document.getElementById('portalPayeeVpa').textContent = upiVpa;
+    }
+    if (document.getElementById('portalMerchantMccBadge')) {
+      if (isMerchant) {
+        document.getElementById('portalMerchantMccBadge').classList.remove('hidden');
+        document.getElementById('portalMerchantMccBadge').textContent = `MCC ${mcc} (Passenger Transport)`;
+      } else {
+        document.getElementById('portalMerchantMccBadge').classList.add('hidden');
+      }
+    }
+    if (document.getElementById('portalMerchantProviderBadge')) {
+      if (isMerchant) {
+        document.getElementById('portalMerchantProviderBadge').classList.remove('hidden');
+        document.getElementById('portalMerchantProviderBadge').textContent = provider;
+      } else {
+        document.getElementById('portalMerchantProviderBadge').classList.add('hidden');
+      }
+    }
+
     // Default to clean zero-risk official bank scanner & UPI mode
     switchPaymentMode('upi');
     switchQrMode('clean');
@@ -931,21 +1020,31 @@ function copyText(text, successMsg = 'Copied to clipboard!') {
   });
 }
 
-function copyMobileNumber() {
-  const phone = '9814124392';
-  navigator.clipboard.writeText(phone).then(() => {
+function copyMerchantOrMobile() {
+  if (!activeStudentData) return;
+  const isMerchant = activeStudentData.payment?.isMerchantAccount || activeStudentData.settings?.accountType === 'merchant';
+  const textToCopy = isMerchant 
+    ? (activeStudentData.payment?.upiId || activeStudentData.settings?.merchantUpiId || 'paytmqr2810050501011@paytm')
+    : (activeStudentData.settings?.ownerPhone || '9814124392');
+
+  navigator.clipboard.writeText(textToCopy).then(() => {
     const btn = document.getElementById('btnCopyMobile');
     if (btn) {
       btn.innerHTML = `<span>✓ Copied!</span>`;
       btn.classList.add('bg-emerald-600');
       setTimeout(() => {
-        btn.innerHTML = `<span>📋 Copy Mobile</span>`;
+        btn.innerHTML = `<span id="btnCopyMobileText">${isMerchant ? '📋 Copy VPA' : '📋 Copy Mobile'}</span>`;
         btn.classList.remove('bg-emerald-600');
       }, 2500);
     }
   }).catch(() => {
-    prompt('Copy Mobile Number:', phone);
+    prompt('Copy:', textToCopy);
   });
+}
+window.copyMerchantOrMobile = copyMerchantOrMobile;
+
+function copyMobileNumber() {
+  copyMerchantOrMobile();
 }
 
 let currentQrMode = 'fixed';
@@ -985,8 +1084,13 @@ function switchQrMode(mode = 'fixed') {
 
 function updateMobileAppLinks() {
   if (!activeStudentData || !activeStudentData.payment) return;
-  const upiId = activeStudentData.payment.upiId || 'himanshu1461@ptyes';
-  const payee = activeStudentData.payment.payeeName || 'HIMANSHU  WALIA';
+  const payment = activeStudentData.payment;
+  const settings = activeStudentData.settings || {};
+  const isMerchant = Boolean(payment.isMerchantAccount || settings.accountType === 'merchant');
+  const upiId = (payment.upiId || (isMerchant ? settings.merchantUpiId : settings.upiId) || 'himanshu1461@ptyes').trim();
+  const payee = (payment.payeeName || (isMerchant ? (settings.merchantBusinessName || 'RAM RAM JI TRANSPORT') : (settings.upiPayeeName || 'HIMANSHU  WALIA'))).trim();
+  const mcc = (payment.merchantMcc || settings.merchantMcc || '4111').trim();
+
   const isClubbed = activeStudentData.isClubbed && activeStudentData.studentsInPayment && activeStudentData.studentsInPayment.length > 1;
   const currentTotal = isClubbed ? activeStudentData.totalAmount : activeStudentData.amount;
   const cleanAmount = Number(currentTotal || 0).toFixed(2);
@@ -994,7 +1098,12 @@ function updateMobileAppLinks() {
   const note = `Bus Fee ${activeStudentData.name} ${targetMonth}`.replace(/[^a-zA-Z0-9 -]/g, ' ').substring(0, 50);
 
   // Dynamic URI with FIXED FEE AMOUNT pre-filled
-  const uri = activeStudentData.payment.dynamicUri || `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payee)}&am=${cleanAmount}&cu=INR&tn=${encodeURIComponent(note)}`;
+  let uri = '';
+  if (isMerchant) {
+    uri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payee)}&mc=${encodeURIComponent(mcc)}&mode=02&purpose=00&am=${cleanAmount}&cu=INR&tn=${encodeURIComponent(note)}`;
+  } else {
+    uri = payment.dynamicUri || `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payee)}&am=${cleanAmount}&cu=INR&tn=${encodeURIComponent(note)}`;
+  }
 
   const linkPhonePe = document.getElementById('linkPhonePe');
   const linkGPay = document.getElementById('linkGPay');

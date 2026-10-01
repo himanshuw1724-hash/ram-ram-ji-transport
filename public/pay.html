@@ -388,45 +388,45 @@
             <!-- OPTION 1: 100% RISK-FREE UPI & VERIFIED SCANNABLE QR CODE -->
             <div id="paymentModeUpiContainer" class="space-y-3.5">
               
-              <!-- 🛡️ PAYTM PROTECT / UPI RISK-FREE ADVISORY -->
-              <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-300 rounded-2xl p-3 text-left space-y-1 shadow-2xs max-w-[320px] mx-auto">
+              <!-- 🛡️ ZERO-RISK MERCHANT / ACCOUNT VERIFICATION ADVISORY -->
+              <div id="upiRiskAdvisoryBanner" class="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-300 rounded-2xl p-3 text-left space-y-1 shadow-2xs max-w-[320px] mx-auto">
                 <div class="flex items-center justify-between">
-                  <span class="text-[10px] font-black uppercase tracking-wider text-emerald-950 flex items-center gap-1">
-                    <span>🛡️</span> 100% Zero-Risk Payment
+                  <span id="advisoryTitle" class="text-[10px] font-black uppercase tracking-wider text-emerald-950 flex items-center gap-1">
+                    <span>🛡️</span> <span id="advisoryTitleText">100% Zero-Risk Merchant Payment</span>
                   </span>
-                  <span class="text-[9px] font-black bg-emerald-200 text-emerald-900 px-1.5 py-0.2 rounded-full">
-                    ✓ Verified Account
+                  <span id="advisoryBadge" class="text-[9px] font-black bg-emerald-200 text-emerald-900 px-1.5 py-0.2 rounded-full">
+                    ✓ Verified Merchant
                   </span>
                 </div>
-                <p class="text-[10px] leading-tight text-emerald-900 font-medium">
-                  As recommended by Paytm Protect: Pay directly via <strong>Mobile Number (9814124392)</strong> or <strong>Scan Official QR</strong> below to avoid app risk warnings.
+                <p id="advisoryDesc" class="text-[10px] leading-tight text-emerald-900 font-medium">
+                  Official NPCI Commercial Merchant (Paytm for Business • MCC 4111). Scan QR code or tap UPI apps below to pay with zero risk alerts and locked fixed fee.
                 </p>
               </div>
 
-              <!-- 📱 METHOD 1: PAY VIA MOBILE NUMBER (PAYTM RECOMMENDED) -->
-              <div class="bg-white p-3.5 rounded-2xl border-2 border-blue-400 shadow-xs text-left max-w-[320px] mx-auto space-y-2">
+              <!-- 📱 METHOD 1: PAY VIA MERCHANT VPA / MOBILE NUMBER -->
+              <div id="methodMobileOrMerchantBox" class="bg-white p-3.5 rounded-2xl border-2 border-blue-400 shadow-xs text-left max-w-[320px] mx-auto space-y-2">
                 <div class="flex items-center justify-between">
-                  <span class="text-[11px] font-black text-blue-950 uppercase tracking-wide flex items-center gap-1">
-                    <span>📱</span> Option A: Pay via Mobile No.
+                  <span id="methodOptionATitle" class="text-[11px] font-black text-blue-950 uppercase tracking-wide flex items-center gap-1">
+                    <span>💼</span> <span id="methodOptionAText">Option A: Official Merchant VPA</span>
                   </span>
-                  <span class="text-[9px] font-black bg-blue-100 text-blue-900 px-1.5 py-0.2 rounded">Recommended by Paytm</span>
+                  <span id="methodOptionABadge" class="text-[9px] font-black bg-blue-100 text-blue-900 px-1.5 py-0.2 rounded">Paytm for Business</span>
                 </div>
                 
                 <div class="bg-blue-50/70 p-2.5 rounded-xl border border-blue-200 space-y-1">
                   <div class="text-[10px] text-slate-500 font-semibold flex items-center justify-between">
-                    <span>Payee Name: <strong class="text-slate-800">Himanshu Walia</strong></span>
-                    <span class="text-emerald-700 font-black text-[10px]">✓ Linked on Paytm</span>
+                    <span>Payee: <strong id="merchantPayeeLabel" class="text-slate-800">RAM RAM JI TRANSPORT</strong></span>
+                    <span id="merchantVerifiedPill" class="text-emerald-700 font-black text-[10px]">✓ NPCI Verified</span>
                   </div>
                   <div class="flex items-center justify-between gap-2 mt-1">
-                    <span id="mobileNumberDisplay" class="text-base font-mono font-black text-blue-950 tracking-wider select-all">9814124392</span>
-                    <button type="button" id="btnCopyMobile" onclick="copyMobileNumber()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-xs rounded-lg transition shadow-xs cursor-pointer flex items-center gap-1">
-                      <span>📋 Copy Mobile</span>
+                    <span id="mobileNumberDisplay" class="text-xs sm:text-sm font-mono font-black text-blue-950 tracking-wider select-all truncate">paytmqr2810050501011@paytm</span>
+                    <button type="button" id="btnCopyMobile" onclick="copyMerchantOrMobile()" class="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-xs rounded-lg transition shadow-xs cursor-pointer flex items-center gap-1 shrink-0">
+                      <span id="btnCopyMobileText">📋 Copy VPA</span>
                     </button>
                   </div>
                 </div>
 
-                <p class="text-[10px] text-slate-500 leading-tight">
-                  Open Paytm, PhonePe or GPay, choose <strong>"To Mobile Number"</strong>, paste <strong>9814124392</strong> and enter fee. Shows verified name <em>Himanshu Walia</em> with 0 risk.
+                <p id="methodOptionAFootnote" class="text-[10px] text-slate-500 leading-tight">
+                  Official merchant account for Ram Ram Ji Transport. Zero Paytm Protect alerts on payments.
                 </p>
               </div>
 
@@ -449,14 +449,18 @@
                   </div>
                 </div>
 
-                <!-- Official Bank Payee Verification -->
+                <!-- Official Payee Verification Card -->
                 <div class="space-y-1 bg-emerald-50/80 p-2.5 rounded-xl border border-emerald-200 text-left">
                   <div class="text-xs font-black text-slate-900 flex items-center justify-between">
-                    <span>Payee: HIMANSHU  WALIA</span>
-                    <span class="w-4 h-4 rounded-full bg-emerald-500 text-white text-[10px] flex items-center justify-center font-black" title="Verified by YES Bank">✓</span>
+                    <span id="portalPayeeName">Payee: RAM RAM JI TRANSPORT</span>
+                    <span class="w-4 h-4 rounded-full bg-emerald-500 text-white text-[10px] flex items-center justify-center font-black" id="portalPayeeVerifiedIcon" title="Verified Commercial Payee">✓</span>
                   </div>
-                  <div class="text-xs font-mono font-bold text-slate-700">
-                    himanshu1461@ptyes
+                  <div class="text-xs font-mono font-bold text-slate-700 truncate" id="portalPayeeVpa">
+                    paytmqr2810050501011@paytm
+                  </div>
+                  <div class="flex items-center justify-between text-[10px] pt-0.5">
+                    <span id="portalMerchantMccBadge" class="font-bold text-emerald-800 bg-emerald-100 px-1.5 py-0.2 rounded border border-emerald-300">MCC 4111 (Passenger Transport)</span>
+                    <span id="portalMerchantProviderBadge" class="font-bold text-blue-800">Paytm for Business</span>
                   </div>
                   <div class="text-[10px] text-emerald-900 font-bold" id="qrAmountHint">
                     🔒 Fixed Monthly Fee is automatically pre-filled when scanned.

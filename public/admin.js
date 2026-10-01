@@ -213,6 +213,14 @@ async function fetchSettings() {
         const bHolder = currentSettings.bankAccountName || 'HIMANSHU WALIA';
         document.getElementById('settingsBankSummary').textContent = `${bName} • ${bAcc} (${bHolder})`;
       }
+      if (document.getElementById('settingsMerchantSummary')) {
+        const isM = currentSettings.accountType === 'merchant';
+        const prov = currentSettings.merchantProvider || 'Paytm for Business';
+        const bName = currentSettings.merchantBusinessName || currentSettings.businessName || 'RAM RAM JI TRANSPORT';
+        document.getElementById('settingsMerchantSummary').textContent = isM 
+          ? `Connected: ${prov} (${bName})`
+          : 'Personal Savings UPI Active (Click to switch to Paytm for Business)';
+      }
       renderFinancialYearMonthSelector();
     }
   } catch (err) {
@@ -3158,6 +3166,151 @@ async function handleBankSubmit(e) {
     showToast('Network error saving bank details', 'error');
   }
 }
+
+// ==========================================
+// BUSINESS MERCHANT ACCOUNT (PAYTM / PHONEPE) MODAL & ACTIONS
+// ==========================================
+
+function openMerchantModal() {
+  const modal = document.getElementById('merchantModal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+
+  const accType = currentSettings.accountType || 'merchant';
+  const provider = currentSettings.merchantProvider || 'Paytm for Business';
+  const bName = currentSettings.merchantBusinessName || currentSettings.businessName || 'RAM RAM JI TRANSPORT';
+  const upiId = currentSettings.merchantUpiId || 'paytmqr2810050501011@paytm';
+  const mcc = currentSettings.merchantMcc || '4111';
+  const mid = currentSettings.merchantMid || '';
+
+  // Radio button toggle
+  const radios = document.getElementsByName('accountTypeRadio');
+  for (const r of radios) {
+    r.checked = (r.value === accType);
+  }
+  handleMerchantModeToggle(accType);
+
+  if (document.getElementById('merchantProviderSelect')) {
+    document.getElementById('merchantProviderSelect').value = provider;
+  }
+  if (document.getElementById('merchantBusinessNameInput')) {
+    document.getElementById('merchantBusinessNameInput').value = bName;
+  }
+  if (document.getElementById('merchantUpiIdInput')) {
+    document.getElementById('merchantUpiIdInput').value = upiId;
+  }
+  if (document.getElementById('merchantMccInput')) {
+    document.getElementById('merchantMccInput').value = mcc;
+  }
+  if (document.getElementById('merchantMidInput')) {
+    document.getElementById('merchantMidInput').value = mid;
+  }
+
+  updateMerchantModalPreview();
+}
+window.openMerchantModal = openMerchantModal;
+
+function closeMerchantModal() {
+  const modal = document.getElementById('merchantModal');
+  if (modal) modal.classList.add('hidden');
+}
+window.closeMerchantModal = closeMerchantModal;
+
+function handleMerchantModeToggle(mode) {
+  const merchantCard = document.getElementById('modeMerchantCard');
+  const personalCard = document.getElementById('modePersonalCard');
+  const fieldsGroup = document.getElementById('merchantFieldsGroup');
+  const advisory = document.getElementById('merchantZeroRiskAdvisory');
+
+  if (mode === 'merchant') {
+    if (merchantCard) {
+      merchantCard.className = 'flex items-start gap-2.5 p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 cursor-pointer transition select-none';
+    }
+    if (personalCard) {
+      personalCard.className = 'flex items-start gap-2.5 p-3 rounded-2xl border-2 border-slate-200 bg-slate-50 cursor-pointer transition select-none hover:border-slate-300';
+    }
+    if (fieldsGroup) fieldsGroup.classList.remove('opacity-50', 'pointer-events-none');
+    if (advisory) advisory.classList.remove('hidden');
+  } else {
+    if (merchantCard) {
+      merchantCard.className = 'flex items-start gap-2.5 p-3 rounded-2xl border-2 border-slate-200 bg-slate-50 cursor-pointer transition select-none hover:border-slate-300';
+    }
+    if (personalCard) {
+      personalCard.className = 'flex items-start gap-2.5 p-3 rounded-2xl border-2 border-blue-500 bg-blue-50/50 cursor-pointer transition select-none';
+    }
+    if (fieldsGroup) fieldsGroup.classList.add('opacity-50', 'pointer-events-none');
+    if (advisory) advisory.classList.add('hidden');
+  }
+  updateMerchantModalPreview();
+}
+window.handleMerchantModeToggle = handleMerchantModeToggle;
+
+function updateMerchantModalPreview() {
+  const provider = document.getElementById('merchantProviderSelect')?.value || 'Paytm for Business';
+  const bName = document.getElementById('merchantBusinessNameInput')?.value || currentSettings.merchantBusinessName || 'RAM RAM JI TRANSPORT';
+  const upiId = document.getElementById('merchantUpiIdInput')?.value || currentSettings.merchantUpiId || 'paytmqr2810050501011@paytm';
+
+  const previewTitle = document.getElementById('merchantPreviewBadgeTitle');
+  const previewProvider = document.getElementById('merchantPreviewProviderBadge');
+  const previewVpa = document.getElementById('merchantPreviewVpa');
+
+  if (previewTitle) previewTitle.textContent = `Verified Merchant: ${bName}`;
+  if (previewProvider) previewProvider.textContent = provider;
+  if (previewVpa) previewVpa.textContent = upiId;
+}
+window.updateMerchantModalPreview = updateMerchantModalPreview;
+
+async function handleMerchantSubmit(e) {
+  e.preventDefault();
+  let selectedMode = 'merchant';
+  const radios = document.getElementsByName('accountTypeRadio');
+  for (const r of radios) {
+    if (r.checked) selectedMode = r.value;
+  }
+
+  const merchantProvider = document.getElementById('merchantProviderSelect')?.value || 'Paytm for Business';
+  const merchantBusinessName = document.getElementById('merchantBusinessNameInput')?.value?.trim() || 'RAM RAM JI TRANSPORT';
+  const merchantUpiId = document.getElementById('merchantUpiIdInput')?.value?.trim() || '';
+  const merchantMcc = document.getElementById('merchantMccInput')?.value?.trim() || '4111';
+  const merchantMid = document.getElementById('merchantMidInput')?.value?.trim() || '';
+
+  if (selectedMode === 'merchant' && !merchantUpiId) {
+    showToast('Please enter your Merchant UPI ID (VPA) from Paytm / PhonePe for Business', 'warning');
+    return;
+  }
+
+  const payload = {
+    accountType: selectedMode,
+    merchantProvider,
+    merchantBusinessName,
+    merchantUpiId,
+    merchantMcc,
+    merchantMid,
+    merchantVerified: true
+  };
+
+  try {
+    showToast('Saving Business Merchant configuration...', 'info');
+    const res = await fetch('/api/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const json = await res.json();
+    if (json.success) {
+      currentSettings = json.data;
+      closeMerchantModal();
+      showToast('✓ Merchant Account connected! Zero Risk alert active on Parent Portal.', 'success');
+      fetchSettings();
+    } else {
+      showToast(json.error || 'Failed to save merchant settings', 'error');
+    }
+  } catch (err) {
+    console.error('Error saving merchant configuration:', err);
+    showToast('Network error saving merchant details', 'error');
+  }
+}
+window.handleMerchantSubmit = handleMerchantSubmit;
 
 // ==========================================
 // SETTINGS MODAL

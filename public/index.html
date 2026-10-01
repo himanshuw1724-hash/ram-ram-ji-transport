@@ -68,7 +68,7 @@
               <span>⚡</span>
               <span>All Admin Functions</span>
             </div>
-            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">10 Options</span>
+            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">11 Options</span>
           </div>
 
           <!-- Section 1: Quick Actions (Add Student & Cash) -->
@@ -93,6 +93,20 @@
           <div class="mb-2.5">
             <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-2 mb-1">Payments & Connectivity</div>
             <div class="space-y-1">
+              <button onclick="closeHeaderMenu(); openMerchantModal();" class="w-full px-2.5 py-2 rounded-xl text-left hover:bg-emerald-50/70 transition flex items-center justify-between cursor-pointer group">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-7 h-7 rounded-lg bg-emerald-100 border border-emerald-300 flex items-center justify-center text-sm group-hover:scale-105 transition">💼</span>
+                  <div>
+                    <div class="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                      <span>Merchant Account</span>
+                      <span class="text-[9px] font-black bg-blue-600 text-white px-1.5 py-0.2 rounded-full uppercase">Paytm Business</span>
+                    </div>
+                    <div class="text-[10px] text-emerald-700/90">Connect Paytm for Business / Merchant (Zero Risk Alert)</div>
+                  </div>
+                </div>
+                <span class="text-emerald-500 text-xs">›</span>
+              </button>
+
               <button onclick="closeHeaderMenu(); openSettingsModal();" class="w-full px-2.5 py-2 rounded-xl text-left hover:bg-slate-50 transition flex items-center justify-between cursor-pointer group">
                 <div class="flex items-center gap-2.5">
                   <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-sm group-hover:scale-105 transition">⚙️</span>
@@ -885,6 +899,23 @@ Bus #07, Highway Express -> City Center" class="w-full px-3 py-2 border border-s
           <input type="text" id="settingsOwnerPhone" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
         </div>
 
+        <!-- Business Merchant Account Connection Banner -->
+        <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border-2 border-emerald-300 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs">
+          <div class="flex items-center gap-2.5">
+            <span class="text-2xl">💼</span>
+            <div>
+              <div class="text-xs font-black text-emerald-950 uppercase tracking-wide flex items-center gap-1.5">
+                <span>Business Merchant Connection</span>
+                <span class="text-[9px] font-black bg-blue-600 text-white px-1.5 py-0.2 rounded-full uppercase">Paytm Business</span>
+              </div>
+              <div class="text-[11px] text-emerald-800" id="settingsMerchantSummary">Connected: Paytm for Business (RAM RAM JI TRANSPORT)</div>
+            </div>
+          </div>
+          <button type="button" onclick="closeSettingsModal(); openMerchantModal();" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
+            Configure
+          </button>
+        </div>
+
         <!-- Bank Account Link & Quick Summary -->
         <div class="bg-indigo-50/70 border border-indigo-200 rounded-2xl p-3.5 flex items-center justify-between">
           <div class="flex items-center gap-2.5">
@@ -1029,6 +1060,139 @@ Bus #07, Highway Express -> City Center" class="w-full px-3 py-2 border border-s
           <button type="button" onclick="closeBankModal()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer">Cancel</button>
           <button type="submit" class="px-5 py-2.5 text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md transition cursor-pointer flex items-center gap-1.5">
             <span>💾 Save Bank Account</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: BUSINESS MERCHANT ACCOUNT (PAYTM / PHONEPE)       -->
+  <!-- ======================================================== -->
+  <div id="merchantModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">💼</span>
+          <div>
+            <h3 class="text-base font-black text-slate-800">Business Merchant Account Setup</h3>
+            <p class="text-[11px] text-slate-500">Connect Paytm for Business, PhonePe Business, or Commercial UPI (Zero Risk Alert)</p>
+          </div>
+        </div>
+        <button onclick="closeMerchantModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1 cursor-pointer">&times;</button>
+      </div>
+
+      <form id="merchantForm" onsubmit="handleMerchantSubmit(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto custom-scroll">
+        
+        <!-- Account Mode Switcher -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Payment Account Mode</label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <label id="modeMerchantCard" class="flex items-start gap-2.5 p-3 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 cursor-pointer transition select-none">
+              <input type="radio" name="accountTypeRadio" value="merchant" checked onchange="handleMerchantModeToggle('merchant')" class="mt-0.5 w-4 h-4 text-emerald-600 focus:ring-emerald-500 border-slate-300">
+              <div>
+                <div class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                  <span>💼 Business Merchant</span>
+                  <span class="text-[9px] font-black bg-emerald-600 text-white px-1.5 py-0.2 rounded-full uppercase">Recommended</span>
+                </div>
+                <div class="text-[10px] text-emerald-900 leading-tight mt-0.5">Paytm for Business / Commercial Merchant. Eliminates Paytm Protect warnings!</div>
+              </div>
+            </label>
+
+            <label id="modePersonalCard" class="flex items-start gap-2.5 p-3 rounded-2xl border-2 border-slate-200 bg-slate-50 cursor-pointer transition select-none hover:border-slate-300">
+              <input type="radio" name="accountTypeRadio" value="personal" onchange="handleMerchantModeToggle('personal')" class="mt-0.5 w-4 h-4 text-slate-600 focus:ring-slate-500 border-slate-300">
+              <div>
+                <div class="text-xs font-bold text-slate-800">👤 Personal Savings UPI</div>
+                <div class="text-[10px] text-slate-500 leading-tight mt-0.5">Personal UPI ID (himanshu1461@ptyes). May show risk policy alert on mobile browsers.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Zero Risk Explanation Callout -->
+        <div id="merchantZeroRiskAdvisory" class="bg-gradient-to-r from-emerald-50 via-teal-50 to-blue-50 border border-emerald-300 rounded-2xl p-3.5 space-y-1.5 shadow-2xs">
+          <div class="flex items-center justify-between">
+            <div class="text-xs font-black text-emerald-950 flex items-center gap-1.5">
+              <span>🛡️</span>
+              <span>NPCI Verified Commercial Merchant Protocol</span>
+            </div>
+            <span class="text-[9px] font-black bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full font-bold">100% Risk Free</span>
+          </div>
+          <p class="text-[11px] text-emerald-900 leading-relaxed">
+            By connecting your <strong>Paytm for Business</strong> merchant account, NPCI and Paytm recognize payments as official commercial transactions (MCC 4111: Passenger Transport). When parents click payment links, apps display the <strong>Verified Business Merchant badge</strong> with <strong>Zero "Paytm Protect" warnings</strong> and the fixed fee pre-filled.
+          </p>
+        </div>
+
+        <!-- Merchant Fields Container -->
+        <div id="merchantFieldsGroup" class="space-y-3.5">
+          <!-- Merchant Provider Selection -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Merchant Provider / App *</label>
+            <select id="merchantProviderSelect" onchange="updateMerchantModalPreview()" class="w-full px-3 py-2 border-2 border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none bg-white cursor-pointer">
+              <option value="Paytm for Business">Paytm for Business (Recommended - Instant Verification)</option>
+              <option value="PhonePe for Business">PhonePe for Business</option>
+              <option value="Google Pay for Business">Google Pay for Business</option>
+              <option value="BHIM / Other Commercial Merchant">BHIM / Other Bank Commercial Merchant</option>
+            </select>
+          </div>
+
+          <!-- Merchant Business Name & UPI VPA -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Registered Business Name *</label>
+              <input type="text" id="merchantBusinessNameInput" required placeholder="e.g. RAM RAM JI TRANSPORT" oninput="updateMerchantModalPreview()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <p class="text-[10px] text-slate-400 mt-0.5">As registered in your merchant account</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Merchant UPI ID (VPA) *</label>
+              <input type="text" id="merchantUpiIdInput" required placeholder="e.g. paytmqr2810050501011@paytm" oninput="updateMerchantModalPreview()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <p class="text-[10px] text-slate-400 mt-0.5">Your official Paytm/PhonePe merchant VPA</p>
+            </div>
+          </div>
+
+          <!-- Merchant Category Code (MCC) & Merchant ID (MID) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Merchant Category Code (MCC) *</label>
+                <span class="text-[9px] font-black bg-blue-100 text-blue-900 px-1.5 py-0.2 rounded">NPCI Standard</span>
+              </div>
+              <input type="text" id="merchantMccInput" required value="4111" oninput="updateMerchantModalPreview()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-900 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <p class="text-[10px] text-emerald-700 font-medium mt-0.5"><code>4111</code> = Local & Suburban Passenger Transportation</p>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Merchant ID / MID (Optional)</label>
+              <input type="text" id="merchantMidInput" placeholder="e.g. 21680055... (optional)" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-mono text-slate-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <p class="text-[10px] text-slate-400 mt-0.5">For internal banking & settlement reference</p>
+            </div>
+          </div>
+
+          <!-- Live Parent Portal Badge Preview -->
+          <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3.5 space-y-2">
+            <div class="text-[10px] font-black text-slate-500 uppercase tracking-wider">Live Preview: How Parents See Your Merchant Account</div>
+            <div class="bg-white border-2 border-emerald-400 rounded-xl p-3 shadow-xs space-y-1.5">
+              <div class="flex items-center justify-between flex-wrap gap-1">
+                <div class="inline-flex items-center gap-1.5 text-xs font-black text-emerald-950">
+                  <span class="w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">✓</span>
+                  <span id="merchantPreviewBadgeTitle">Verified Merchant: RAM RAM JI TRANSPORT</span>
+                </div>
+                <span class="text-[10px] font-black bg-blue-100 text-blue-950 px-2 py-0.5 rounded-full border border-blue-200" id="merchantPreviewProviderBadge">Paytm for Business</span>
+              </div>
+              <div class="text-[11px] font-mono text-slate-600 flex items-center justify-between">
+                <span>VPA: <strong id="merchantPreviewVpa" class="text-slate-900">paytmqr2810050501011@paytm</strong></span>
+                <span class="text-[10px] font-bold text-emerald-700">MCC 4111 (Passenger Transport)</span>
+              </div>
+              <div class="text-[10px] text-emerald-800 font-semibold bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-200">
+                🔒 Fixed Monthly Fee (₹2,310) pre-filled • Zero UPI Risk Policy alerts
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeMerchantModal()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer">Cancel</button>
+          <button type="submit" class="px-5 py-2.5 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md transition cursor-pointer flex items-center gap-1.5">
+            <span>💾 Save Merchant Account</span>
           </button>
         </div>
       </form>

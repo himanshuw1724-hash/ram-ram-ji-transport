@@ -36,7 +36,14 @@
       "February 2027",
       "March 2027"
     ],
-    "useCustomQr": false
+    "useCustomQr": false,
+    "accountType": "merchant",
+    "merchantProvider": "Paytm for Business",
+    "merchantUpiId": "paytmqr2810050501011@paytm",
+    "merchantBusinessName": "RAM RAM JI TRANSPORT",
+    "merchantMcc": "4111",
+    "merchantMid": "",
+    "merchantVerified": true
   },
   "buses": [
     {
@@ -4934,6 +4941,12 @@
       "username": "admin",
       "createdAt": "2026-10-01T10:54:37.345Z",
       "expiresAt": "2026-10-31T10:54:37.345Z"
+    },
+    {
+      "token": "d173d4eaaf4d35d825fa06a39d09493585e42206d519a4fe7d284f5398f6ed92",
+      "username": "admin",
+      "createdAt": "2026-10-01T14:40:07.820Z",
+      "expiresAt": "2026-10-31T14:40:07.820Z"
     }
   ]
 }
