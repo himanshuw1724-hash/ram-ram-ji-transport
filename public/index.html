@@ -1,0 +1,1619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAM RAM JI TRANSPORT | School Bus Fee & Fleet Manager</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .badge-bus { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-3">
+      <!-- Brand Logo & Title -->
+      <div class="flex items-center gap-2.5 shrink-0">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-400 flex items-center justify-center text-white text-xl shadow-xs shadow-amber-200">
+          🚌
+        </div>
+        <div>
+          <h1 id="brandTitle" class="text-sm sm:text-base font-black text-slate-800 leading-tight">RAM RAM JI TRANSPORT</h1>
+          <p class="text-[11px] font-medium text-slate-500 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+            <span>Fleet & Payment Manager</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Combined Single Header Options Button -->
+      <div class="relative">
+        <button id="headerMenuBtn" onclick="toggleHeaderMenu(event)" class="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-extrabold text-slate-800 bg-gradient-to-r from-slate-100 to-slate-200 hover:from-slate-200 hover:to-slate-300 border border-slate-300 rounded-xl transition shadow-xs flex items-center gap-2 cursor-pointer active:scale-95 select-none" aria-haspopup="true" aria-expanded="false" title="Click to view all admin options">
+          <span class="text-base sm:text-lg leading-none">☰</span>
+          <span class="tracking-wide">All Options</span>
+          <svg id="headerMenuChevron" class="w-4 h-4 text-slate-600 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+
+        <!-- All Options Dropdown Menu Card -->
+        <div id="headerMenuDropdown" class="hidden absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-96 max-w-sm bg-white border border-slate-200 rounded-2xl shadow-2xl p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+          <!-- Dropdown Header -->
+          <div class="flex items-center justify-between px-2 pb-2.5 mb-2.5 border-b border-slate-100">
+            <div class="flex items-center gap-1.5 text-xs font-black text-slate-700 uppercase tracking-wider">
+              <span>⚡</span>
+              <span>All Admin Functions</span>
+            </div>
+            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full">10 Options</span>
+          </div>
+
+          <!-- Section 1: Quick Actions (Add Student & Cash) -->
+          <div class="grid grid-cols-2 gap-2 mb-3">
+            <button onclick="closeHeaderMenu(); openStudentModal();" class="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-left transition flex items-center gap-2.5 shadow-xs cursor-pointer group">
+              <span class="w-8 h-8 rounded-lg bg-emerald-500/80 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition">➕</span>
+              <div>
+                <div class="text-xs font-black leading-tight">Add Student</div>
+                <div class="text-[10px] text-emerald-100 leading-tight">Register new pupil</div>
+              </div>
+            </button>
+            <button onclick="closeHeaderMenu(); openCashModal();" class="p-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-950 text-left transition flex items-center gap-2.5 shadow-2xs cursor-pointer group">
+              <span class="w-8 h-8 rounded-lg bg-amber-200 flex items-center justify-center text-base shrink-0 group-hover:scale-105 transition">💵</span>
+              <div>
+                <div class="text-xs font-black leading-tight">+ Cash Pay</div>
+                <div class="text-[10px] text-amber-800 leading-tight">Record offline cash</div>
+              </div>
+            </button>
+          </div>
+
+          <!-- Section 2: Payments & Gateways -->
+          <div class="mb-2.5">
+            <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-2 mb-1">Payments & Connectivity</div>
+            <div class="space-y-1">
+              <button onclick="closeHeaderMenu(); openSettingsModal();" class="w-full px-2.5 py-2 rounded-xl text-left hover:bg-slate-50 transition flex items-center justify-between cursor-pointer group">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-7 h-7 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-sm group-hover:scale-105 transition">⚙️</span>
+                  <div>
+                    <div class="text-xs font-bold text-slate-800">UPI & Scanner Settings</div>
+                    <div class="text-[10px] text-slate-500">Configure UPI ID, Name & QR Scanner Code</div>
+                  </div>
+                </div>
+                <span class="text-slate-400 text-xs">›</span>
+              </button>
+
+              <button onclick="closeHeaderMenu(); openBankModal();" class="w-full px-2.5 py-2 rounded-xl text-left hover:bg-indigo-50/60 transition flex items-center justify-between cursor-pointer group">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-7 h-7 rounded-lg bg-indigo-100 border border-indigo-200 flex items-center justify-center text-sm group-hover:scale-105 transition">🏦</span>
+                  <div>
+                    <div class="text-xs font-bold text-indigo-950">Bank A/C Details</div>
+                    <div class="text-[10px] text-indigo-600/80">Manage Bank Name, A/C No & IFSC code</div>
+                  </div>
+                </div>
+                <span class="text-slate-400 text-xs">›</span>
+              </button>
+
+              <button onclick="closeHeaderMenu(); openStopFeeManagerModal();" class="w-full px-2.5 py-2 rounded-xl text-left hover:bg-rose-50/60 transition flex items-center justify-between cursor-pointer group">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-7 h-7 rounded-lg bg-rose-100 border border-rose-200 flex items-center justify-center text-sm group-hover:scale-105 transition">🛑</span>
+                  <div>
+                    <div class="text-xs font-bold text-rose-950">Fee Stopped Students</div>
+                    <div class="text-[10px] text-rose-600/80">Stop upcoming fees for pupils who left</div>
+                  </div>
+                </div>
+                <span class="text-slate-400 text-xs">›</span>
+              </button>
+
+              <button onclick="closeHeaderMenu(); openWifiModal();" class="w-full px-2.5 py-2 rounded-xl text-left hover:bg-sky-50/60 transition flex items-center justify-between cursor-pointer group">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-7 h-7 rounded-lg bg-sky-100 border border-sky-200 flex items-center justify-center text-sm group-hover:scale-105 transition">📶</span>
+                  <div>
+                    <div class="text-xs font-bold text-sky-950">Wi-Fi & Mobile Access</div>
+                    <div class="text-[10px] text-sky-600/80">Open on phone via Local Wi-Fi or Cloud Link</div>
+                  </div>
+                </div>
+                <span class="text-slate-400 text-xs">›</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 3: Directory & Fleet Management -->
+          <div class="mb-2.5">
+            <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-2 mb-1">Fleet & School Directory</div>
+            <div class="space-y-1">
+              <button onclick="closeHeaderMenu(); openSchoolsModal();" class="w-full px-2.5 py-2 rounded-xl text-left hover:bg-sky-50/60 transition flex items-center justify-between cursor-pointer group">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-7 h-7 rounded-lg bg-sky-100 border border-sky-200 flex items-center justify-center text-sm group-hover:scale-105 transition">🏫</span>
+                  <div>
+                    <div class="text-xs font-bold text-sky-950">Schools Directory</div>
+                    <div class="text-[10px] text-sky-600/80">Manage affiliated school heads & list</div>
+                  </div>
+                </div>
+                <span class="text-slate-400 text-xs">›</span>
+              </button>
+
+              <button onclick="closeHeaderMenu(); openBusesModal();" class="w-full px-2.5 py-2 rounded-xl text-left hover:bg-amber-50/60 transition flex items-center justify-between cursor-pointer group">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-7 h-7 rounded-lg bg-amber-100 border border-amber-200 flex items-center justify-center text-sm group-hover:scale-105 transition">🚌</span>
+                  <div>
+                    <div class="text-xs font-bold text-amber-950">Bus Fleet & Routes</div>
+                    <div class="text-[10px] text-amber-800/80">Manage buses, routes, drivers & stops</div>
+                  </div>
+                </div>
+                <span class="text-slate-400 text-xs">›</span>
+              </button>
+
+              <button onclick="closeHeaderMenu(); openClubSiblingsModal();" class="w-full px-2.5 py-2 rounded-xl text-left hover:bg-indigo-50/60 transition flex items-center justify-between cursor-pointer group">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-7 h-7 rounded-lg bg-indigo-100 border border-indigo-200 flex items-center justify-center text-sm group-hover:scale-105 transition">👨‍👩‍👧</span>
+                  <div>
+                    <div class="text-xs font-bold text-indigo-950">Siblings Grouping</div>
+                    <div class="text-[10px] text-indigo-600/80">Link brother/sister to pay combined fee</div>
+                  </div>
+                </div>
+                <span class="text-slate-400 text-xs">›</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section 4: Logout -->
+          <div class="pt-2 border-t border-slate-100">
+            <button onclick="closeHeaderMenu(); handleLogout();" class="w-full px-2.5 py-2 rounded-xl text-left hover:bg-rose-50 text-rose-700 transition flex items-center justify-between cursor-pointer group">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-lg bg-rose-100 border border-rose-200 flex items-center justify-center text-sm group-hover:scale-105 transition">🚪</span>
+                <div>
+                  <div class="text-xs font-bold text-rose-800">Sign Out / Logout</div>
+                  <div class="text-[10px] text-rose-600/80">End current admin session</div>
+                </div>
+              </div>
+              <span class="text-rose-400 text-xs">›</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 space-y-3">
+
+    <!-- UNIFIED OPERATIONS CONTROL BAR: Financial Year & Session Management + Universal Parent Link -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch">
+      <!-- Panel 1: Financial Year & Active Billing Session (5 cols on large desktop) -->
+      <div class="lg:col-span-5 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between gap-2.5">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">📅</span>
+            <div>
+              <span class="text-xs font-black text-slate-900 uppercase tracking-wide">Financial Year & Billing Session</span>
+            </div>
+          </div>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200">
+            Active Session
+          </span>
+        </div>
+
+        <!-- Year & Active Billing Month Selectors (Grid 2-Col) -->
+        <div class="grid grid-cols-2 gap-2 pt-0.5">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Financial Year</label>
+            <select id="financialYearSelect" onchange="changeFinancialYear(this.value)" class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-black text-slate-900 focus:ring-2 focus:ring-indigo-500 focus:bg-white transition cursor-pointer">
+              <option value="2026–2027" selected>2026–2027 (Current)</option>
+              <option value="2027–2028">2027–2028</option>
+              <option value="2028–2029">2028–2029</option>
+              <option value="2029–2030">2029–2030</option>
+              <option value="2030–2031">2030–2031</option>
+              <option value="__custom__">➕ Custom / Any Other Future Year...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Active Billing Month</label>
+            <select id="activeBillingMonthSelect" onchange="changeActiveBillingMonth(this.value)" class="w-full px-2.5 py-1.5 bg-indigo-50/80 border border-indigo-300 rounded-xl text-xs font-black text-indigo-950 focus:ring-2 focus:ring-indigo-500 focus:bg-white transition cursor-pointer">
+              <!-- Populated dynamically with months of selected year -->
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 2: Universal Parent Payment Portal Link (7 cols on large desktop) -->
+      <div class="lg:col-span-7 bg-gradient-to-r from-emerald-800 via-teal-800 to-slate-900 text-white p-3.5 rounded-2xl shadow-xs flex flex-col justify-between gap-2.5">
+        <div class="flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/30 text-emerald-200 text-xs font-black tracking-wide border border-emerald-400/30 shrink-0">
+              <span>📢</span> Parent Payment Portal
+            </span>
+            <span id="secureHttpsBadge" class="hidden text-[10px] font-black bg-emerald-300 text-emerald-950 px-2 py-0.5 rounded-full border border-emerald-400 shrink-0">
+              🔒 SSL HTTPS
+            </span>
+          </div>
+          <span class="text-[11px] text-emerald-200/80 hidden sm:inline">Parents select bus & pay securely</span>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          <div class="flex-1 min-w-0 text-xs font-mono font-bold bg-black/35 px-3 py-2 rounded-xl text-emerald-100 truncate" id="universalLinkDisplay">
+            Loading link...
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0 w-full sm:w-auto">
+            <button onclick="copyUniversalLink()" class="flex-1 sm:flex-none px-3 py-2 bg-white hover:bg-emerald-50 text-emerald-900 font-black text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1 cursor-pointer" title="Copy Parent Payment Link to Clipboard">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+              <span>Copy</span>
+            </button>
+            <button onclick="shareUniversalWhatsApp()" class="flex-1 sm:flex-none px-3 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-xs transition flex items-center justify-center gap-1 cursor-pointer" title="Share via WhatsApp Broadcast">
+              <span>💬</span> <span>WhatsApp</span>
+            </button>
+            <a href="/pay" target="_blank" class="flex-1 sm:flex-none px-2.5 py-2 bg-white/15 hover:bg-white/25 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1" title="Preview Parent View in New Tab">
+              <span>👁️</span> <span>Test View</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dynamic Awaiting Verification Alert Banner (Auto-shows when parent pays) -->
+    <div id="awaitingAlertBanner" class="hidden px-3.5 py-2.5 rounded-xl bg-amber-500/15 border-2 border-amber-400 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 shadow-sm animate-in fade-in">
+      <div class="flex items-center gap-2.5">
+        <span class="text-2xl animate-bounce">🔔</span>
+        <div>
+          <div class="text-xs sm:text-sm font-black text-amber-950 flex items-center gap-2">
+            <span id="awaitingAlertTitle">1 New Payment Awaiting Verification!</span>
+            <span class="text-[10px] uppercase font-black px-1.5 py-0.5 bg-amber-300 text-amber-950 rounded-md">Action Needed</span>
+          </div>
+          <div class="text-[11px] text-amber-800" id="awaitingAlertDesc">
+            Parents completed UPI payment. Please check bank credit to unlock official stamped receipts.
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto">
+        <button onclick="filterAwaitingPayments()" class="flex-1 sm:flex-none px-3 py-1.5 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white font-black text-xs rounded-lg shadow-xs transition flex items-center justify-center gap-1 cursor-pointer">
+          <span>🔍 View & Verify Now</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Statistics Grid (Compact & Sleek) -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 sm:gap-2.5" id="statsGrid">
+      <!-- Active Buses -->
+      <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-amber-200 bg-amber-50/30 shadow-xs">
+        <div class="text-[11px] font-bold text-amber-800 uppercase tracking-wider">Fleet Buses</div>
+        <div id="statActiveBuses" class="text-xl sm:text-2xl font-black text-amber-600 mt-0.5">-</div>
+        <div class="text-[10px] text-slate-400">Active bus routes</div>
+      </div>
+
+      <!-- Total Students -->
+      <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-xs">
+        <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Total Students</div>
+        <div id="statTotalStudents" class="text-xl sm:text-2xl font-black text-slate-800 mt-0.5">-</div>
+        <div class="text-[10px] text-slate-400">Across all buses</div>
+      </div>
+
+      <!-- Expected Total Fee -->
+      <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-slate-200 shadow-xs">
+        <div class="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Expected Fees</div>
+        <div id="statTotalRevenue" class="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">-</div>
+        <div class="text-[10px] text-slate-400" id="expectedFeeMonthLabel">Current month</div>
+      </div>
+
+      <!-- Total Collected (Verified) -->
+      <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-emerald-200 bg-emerald-50/40 shadow-xs">
+        <div class="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider">Paid / Verified</div>
+        <div id="statCollectedRevenue" class="text-xl sm:text-2xl font-black text-emerald-600 mt-0.5">-</div>
+        <div id="statPaidCount" class="text-[10px] text-emerald-700 font-medium mt-0.5">0 verified</div>
+      </div>
+
+      <!-- Awaiting Verification (Parents submitted UTR) - Clickable to filter -->
+      <div id="cardAwaitingCheck" onclick="filterAwaitingPayments()" title="Click to filter students awaiting bank verification" class="bg-white p-2.5 sm:p-3 rounded-xl border border-blue-200 bg-blue-50/40 shadow-xs cursor-pointer hover:bg-blue-100/50 hover:border-blue-400 transition group relative">
+        <div class="flex items-center justify-between">
+          <div class="text-[11px] font-semibold text-blue-800 uppercase tracking-wider">Awaiting Check</div>
+          <span id="awaitingCheckPulse" class="hidden w-2.5 h-2.5 rounded-full bg-blue-600 animate-ping"></span>
+        </div>
+        <div id="statSubmittedCount" class="text-xl sm:text-2xl font-black text-blue-600 mt-0.5">0</div>
+        <div class="text-[10px] text-blue-600 font-semibold mt-0.5 flex items-center justify-between">
+          <span id="statSubmittedRevenue">₹0 to verify</span>
+          <span class="font-bold text-blue-500 group-hover:text-blue-700 transition">View →</span>
+        </div>
+      </div>
+
+      <!-- Dues Pending -->
+      <div class="bg-white p-2.5 sm:p-3 rounded-xl border border-rose-200 bg-rose-50/40 shadow-xs">
+        <div class="text-[11px] font-semibold text-rose-800 uppercase tracking-wider">Pending Dues</div>
+        <div id="statPendingRevenue" class="text-xl sm:text-2xl font-black text-rose-600 mt-0.5">-</div>
+        <div id="statPendingCount" class="text-[10px] text-rose-700 font-medium mt-0.5">0 unpaid</div>
+      </div>
+
+      <!-- Left / Stopped Students KPI Card -->
+      <div id="cardLeftStudents" onclick="filterLeftStudents()" title="Click to view students who left bus transport" class="bg-white p-2.5 sm:p-3 rounded-xl border border-rose-200 bg-rose-50/30 shadow-xs cursor-pointer hover:bg-rose-100/60 hover:border-rose-400 transition group">
+        <div class="flex items-center justify-between">
+          <div class="text-[11px] font-bold text-rose-800 uppercase tracking-wider">Students Left</div>
+          <span class="text-[9px] font-black bg-rose-100 text-rose-800 px-1 py-0.2 rounded border border-rose-200">₹0 Fee</span>
+        </div>
+        <div id="statLeftStudentsCount" class="text-xl sm:text-2xl font-black text-rose-700 mt-0.5">0</div>
+        <div class="text-[10px] text-rose-600 font-semibold mt-0.5 flex items-center justify-between">
+          <span id="statLeftSubtext">Discontinued</span>
+          <span class="font-bold text-rose-500 group-hover:text-rose-800 transition">View →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Controls (Organized & Compact) -->
+    <div class="bg-white px-3.5 py-2.5 rounded-xl border border-slate-200 shadow-xs">
+      <div class="flex flex-col md:flex-row gap-2.5 items-stretch md:items-center justify-between">
+        
+        <!-- Search Input -->
+        <div class="relative flex-1">
+          <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" id="searchInput" placeholder="Search student name, bus number, stop, or parent phone..." class="w-full pl-9 pr-4 py-1.5 border border-slate-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+        </div>
+
+        <!-- Dropdown Filters (School, Bus, Status) -->
+        <div class="flex flex-wrap sm:flex-nowrap gap-2 items-center">
+          <!-- School Filter Dropdown -->
+          <select id="schoolFilter" onchange="handleSchoolFilterChange(this.value)" class="px-2.5 py-1.5 border-2 border-sky-300 rounded-lg text-xs font-bold bg-sky-50/50 text-sky-950 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer shadow-xs" title="Filter roster by School">
+            <option value="">All Schools</option>
+          </select>
+
+          <!-- Bus Filter (Main) -->
+          <select id="busFilter" class="px-2.5 py-1.5 border-2 border-amber-300 rounded-lg text-xs font-bold bg-amber-50/50 text-amber-950 focus:outline-none focus:ring-2 focus:ring-amber-500">
+            <option value="">All Buses</option>
+          </select>
+
+          <!-- Status Filter -->
+          <select id="statusFilter" class="px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold">
+            <option value="">All Statuses</option>
+            <option value="active">🟢 Active Bus Users</option>
+            <option value="left">🛑 Left / Discontinued</option>
+            <option value="cash">💵 Paid via Cash</option>
+            <option value="online">📱 Paid via UPI / Online</option>
+            <option value="paid">✓ All Paid / Verified</option>
+            <option value="submitted">⏳ Awaiting Verification</option>
+            <option value="pending">⚠️ Pending / Unpaid</option>
+          </select>
+
+          <!-- Reset Filter -->
+          <button onclick="resetFilters()" title="Reset Filters" class="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          </button>
+
+          <!-- Download CSV / Excel Report Button (Filter Bar) -->
+          <button type="button" onclick="downloadMonthlyReportCsv()" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white rounded-lg text-xs font-black shadow-xs transition flex items-center gap-1.5 cursor-pointer shrink-0" title="Download Monthly Fee & Transport Report as CSV / Excel">
+            <svg class="w-3.5 h-3.5 text-emerald-100" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>Download CSV / Excel</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Student List Section (Bus Column Prominent & Alphabetical A-Z Ordering) -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+      <div class="px-4 py-3 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <h2 class="font-bold text-slate-800 text-sm sm:text-base" id="rosterMonthHeading">Student Transport & Payment Roster</h2>
+          <span id="studentCountBadge" class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold">0</span>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- View Mode Toggle: Cards (Mobile Default) vs Table (Desktop Default) -->
+          <div class="inline-flex p-0.5 bg-slate-100 rounded-lg border border-slate-200 text-xs font-bold shadow-2xs">
+            <button type="button" id="btnViewCards" onclick="switchRosterView('cards')" class="px-2.5 py-1 rounded-md transition flex items-center gap-1 cursor-pointer bg-white text-indigo-900 shadow-xs" title="Mobile Card View — Recommended for Phones">
+              <span>🗂️</span> <span>Cards</span>
+            </button>
+            <button type="button" id="btnViewTable" onclick="switchRosterView('table')" class="px-2.5 py-1 rounded-md transition flex items-center gap-1 cursor-pointer text-slate-500 hover:text-slate-900" title="Full Spreadsheet Table View">
+              <span>📊</span> <span>Table</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Cards Container (Shown on phones by default so all details are completely visible) -->
+      <div id="studentCardsContainer" class="p-3 sm:p-4 space-y-3.5 bg-slate-50/60 block md:hidden">
+        <div class="py-8 text-center text-slate-400">Loading student roster...</div>
+      </div>
+
+      <!-- Responsive Table Container (Table view with minimum width to prevent column squishing) -->
+      <div id="studentTableContainer" class="overflow-x-auto custom-scroll hidden md:block">
+        <div id="tableMobileScrollNotice" class="md:hidden px-3.5 py-2 bg-amber-50 border-b border-amber-200 text-xs font-bold text-amber-900 flex items-center justify-between">
+          <span class="flex items-center gap-1.5"><span>👉</span> <span>Swipe horizontally to view all columns</span></span>
+          <button onclick="switchRosterView('cards')" class="text-indigo-700 underline font-black">Switch to Cards View</button>
+        </div>
+        <table class="w-full min-w-[1050px] text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50/90 text-slate-600 text-xs font-bold uppercase tracking-wider border-b border-slate-200">
+              <th class="py-2.5 px-4 w-[110px]">Assigned Bus</th>
+              <th class="py-2.5 px-4 min-w-[200px]">Student Details</th>
+              <th class="py-2.5 px-4 min-w-[150px]">Pickup / Route Stop</th>
+              <th class="py-2.5 px-4 min-w-[150px]">Parent Contact</th>
+              <th class="py-2.5 px-4 min-w-[130px]">
+                <div class="flex items-center gap-1">
+                  <span>Fee in Month</span>
+                  <span class="text-[9px] font-bold text-slate-500 bg-slate-200/80 px-1 py-0.2 rounded" title="Shows actual fee paid for paid months, or fixed fee due for upcoming months">Actual / Due</span>
+                </div>
+              </th>
+              <th class="py-2.5 px-4 min-w-[210px]">
+                <div class="flex items-center gap-1.5">
+                  <span>Fee Month & Status</span>
+                  <span class="text-[10px] text-emerald-800 bg-emerald-100 font-black px-1.5 py-0.5 rounded border border-emerald-300" title="Select month and view/manage status">Select</span>
+                </div>
+              </th>
+              <th class="py-2.5 px-3 text-center md:sticky md:right-0 bg-slate-50 z-20 md:border-l md:border-slate-200 min-w-[140px] md:shadow-[-4px_0_6px_-2px_rgba(0,0,0,0.06)]">
+                <span>Actions / Options</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody" class="divide-y divide-slate-100 text-sm">
+            <tr>
+              <td colspan="7" class="py-8 text-center text-slate-400">Loading student roster...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+
+  <!-- ======================================================== -->
+  <!-- MODAL: ADD / EDIT STUDENT                               -->
+  <!-- ======================================================== -->
+  <div id="studentModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <h3 id="modalStudentTitle" class="text-lg font-bold text-slate-800">Add Student</h3>
+        <button onclick="closeStudentModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      </div>
+
+      <form id="studentForm" onsubmit="handleStudentSubmit(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto custom-scroll">
+        <input type="hidden" id="studentId" value="">
+
+        <!-- SCHOOL & BUS HIERARCHY (SCHOOL HEAD -> BUS SUB-HEAD) -->
+        <div class="bg-gradient-to-r from-sky-50 via-blue-50 to-amber-50 p-4 rounded-2xl border-2 border-sky-300 space-y-3 shadow-xs">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <span>🏫</span> <span>School & Assigned Bus Fleet *</span>
+            </span>
+            <span class="text-[10px] font-bold text-sky-900 bg-sky-100 px-2 py-0.5 rounded-full border border-sky-200">Hierarchy Managed</span>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-sky-950 uppercase tracking-wider mb-1">1. Enrolled School (Head) *</label>
+              <select id="modalSchoolSelect" onchange="handleModalSchoolSelectChange()" class="w-full px-3 py-2 border-2 border-sky-400 rounded-xl text-xs font-black text-slate-900 focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white cursor-pointer shadow-xs">
+                <!-- populated from currentSchools -->
+              </select>
+              <input type="text" id="modalSchoolName" placeholder="Or enter custom school name" class="hidden w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs mt-1 focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-amber-950 uppercase tracking-wider mb-1">2. Bus Number (Under School) *</label>
+              <div class="space-y-1">
+                <select id="modalBusSelect" onchange="handleModalBusSelect()" class="w-full px-3 py-2 border-2 border-amber-400 rounded-xl text-xs font-black text-slate-900 bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none cursor-pointer shadow-xs">
+                  <!-- populated dynamically based on selected school! -->
+                </select>
+                <input type="text" id="modalBusNumber" required placeholder="Custom bus number if needed" class="hidden w-full px-3 py-1.5 border border-amber-300 rounded-lg text-xs font-bold text-slate-800 bg-white focus:ring-2 focus:ring-amber-500 focus:outline-none">
+              </div>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-600 font-medium" id="modalSchoolBusHelperText">
+            Selecting a school above immediately displays only the buses belonging to that school.
+          </p>
+        </div>
+
+        <!-- Student Name & Class -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Student Name *</label>
+            <input type="text" id="modalStudentName" required placeholder="e.g. Aarav Sharma" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Class & Section</label>
+            <input type="text" id="modalClassGrade" placeholder="e.g. Class 7 - A" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Pickup Stop -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Pickup / Route Stop</label>
+          <input type="text" id="modalRouteStop" placeholder="e.g. Sector 15 Market Gate / PAP Campus Gate" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <!-- Fixed Payment Fee & Billing Period -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Fixed Monthly Fee (₹) *</label>
+            <input type="number" id="modalAmount" required min="0" step="10" placeholder="e.g. 2500" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-black text-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Billing Month (FY 2026-27) *</label>
+            <select id="modalBillingPeriod" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none font-semibold">
+              <option value="April 2026">April 2026</option>
+              <option value="May 2026">May 2026</option>
+              <option value="June 2026">June 2026</option>
+              <option value="July 2026">July 2026</option>
+              <option value="August 2026">August 2026</option>
+              <option value="September 2026" selected>September 2026 (Current)</option>
+              <option value="October 2026">October 2026</option>
+              <option value="November 2026">November 2026</option>
+              <option value="December 2026">December 2026</option>
+              <option value="January 2027">January 2027</option>
+              <option value="February 2027">February 2027</option>
+              <option value="March 2027">March 2027</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Parent Details -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Parent's Name</label>
+            <input type="text" id="modalParentName" placeholder="e.g. Mr. Sanjay Sharma" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Parent Phone / WhatsApp (Optional)</label>
+            <input type="text" id="modalParentPhone" placeholder="e.g. 9876543210 (Optional)" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Status & Transport Service -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Payment Status</label>
+            <select id="modalStatus" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none font-semibold">
+              <option value="pending">⚠️ Pending (Unpaid)</option>
+              <option value="submitted">⏳ Awaiting Check (Submitted)</option>
+              <option value="paid">✓ Paid & Verified</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Bus Transport Service</label>
+            <select id="modalServiceStatus" onchange="handleModalServiceStatusChange(this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none font-semibold cursor-pointer">
+              <option value="active">🟢 Active Bus User</option>
+              <option value="left">🛑 Left / Discontinued (Stop Upcoming Fee)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Dynamic Departure Month & Reason (Shown when marked Left) -->
+        <div id="modalDepartureDetails" class="hidden p-3.5 bg-rose-50 border border-rose-200 rounded-xl space-y-3 animate-in fade-in">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-rose-950 flex items-center gap-1.5">
+              <span>🛑</span> <span>Discontinue Bus Service & Stop Fees</span>
+            </span>
+            <span class="text-[10px] font-bold text-rose-700 bg-rose-200 px-2 py-0.5 rounded">Upcoming Fees: ₹0</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Stop Fee From Month *</label>
+              <select id="modalLeftFromMonth" class="w-full px-3 py-2 border border-rose-300 rounded-lg text-xs font-bold focus:ring-2 focus:ring-rose-500 focus:outline-none bg-white">
+                <!-- FY months populated dynamically -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Reason for Leaving</label>
+              <input type="text" id="modalLeftReason" placeholder="e.g. Left school / Shifted..." class="w-full px-3 py-2 border border-rose-300 rounded-lg text-xs focus:ring-2 focus:ring-rose-500 focus:outline-none bg-white">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Internal Notes</label>
+          <input type="text" id="modalNotes" placeholder="e.g. Travels with sibling" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeStudentModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition">Cancel</button>
+          <button type="submit" id="modalSaveBtn" class="px-5 py-2 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition">Save Student</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: FLEET & BUS MANAGEMENT (Add Single or Bus List)   -->
+  <!-- ======================================================== -->
+  <div id="busesModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-amber-50/80 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🚌</span>
+          <div>
+            <h3 class="text-base font-black text-amber-950">Bus Fleet & Route Manager</h3>
+            <p class="text-xs text-amber-800">Add new buses, import bus lists, and manage route assignments</p>
+          </div>
+        </div>
+        <button onclick="closeBusesModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold p-1">&times;</button>
+      </div>
+
+      <div class="p-6 overflow-y-auto custom-scroll space-y-5 flex-1">
+        <!-- Mode Switcher Tabs: Single Bus vs Bulk Bus List -->
+        <div class="flex border-b border-slate-200">
+          <button type="button" id="tabBusSingleBtn" onclick="switchBusTab('single')" class="py-2.5 px-4 border-b-2 font-bold text-xs border-amber-600 text-amber-900 flex items-center gap-1.5 transition">
+            <span>➕</span> Add Single Bus
+          </button>
+          <button type="button" id="tabBusBulkBtn" onclick="switchBusTab('bulk')" class="py-2.5 px-4 border-b-2 font-bold text-xs border-transparent text-slate-500 hover:text-slate-700 flex items-center gap-1.5 transition">
+            <span>📋</span> Add New Bus List (Bulk Import)
+          </button>
+        </div>
+
+        <!-- TAB 1: Single Bus Form -->
+        <div id="busSingleTabSection" class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+          <div class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center justify-between">
+            <span class="flex items-center gap-1.5"><span>🚌</span> Add Bus (Sub-Head Under School)</span>
+            <span class="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">Hierarchy Managed</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Parent School (Head) *</label>
+              <select id="newBusSchool" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+                <!-- populated from currentSchools -->
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Bus Number *</label>
+              <input type="text" id="newBusNumber" placeholder="e.g. S3 or D1" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Route / Areas / Stops</label>
+              <input type="text" id="newBusRoute" placeholder="e.g. Model Town -> Civil Lines" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Driver Name (Optional)</label>
+              <input type="text" id="newBusDriver" placeholder="e.g. Suresh Pal" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Driver Phone (Optional)</label>
+              <input type="text" id="newBusPhone" placeholder="e.g. 9814124392" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+          </div>
+          <div class="flex justify-end pt-1">
+            <button type="button" onclick="handleAddBus()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-amber-950 font-black text-xs rounded-lg shadow transition flex items-center gap-1 cursor-pointer">
+              <span>+</span> Add Bus Under School
+            </button>
+          </div>
+        </div>
+
+        <!-- TAB 2: Bulk Bus List Import Form -->
+        <div id="busBulkTabSection" class="hidden bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+          <div class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center justify-between">
+            <span class="flex items-center gap-1.5"><span>📋</span> Paste or Type Bus List</span>
+            <span class="text-[11px] font-semibold text-slate-500">1 bus per line</span>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Assign Imported Buses to School (Head) *</label>
+            <select id="bulkBusSchool" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white">
+              <!-- populated from currentSchools -->
+            </select>
+          </div>
+          <p class="text-[11px] text-slate-600 leading-relaxed">
+            Quickly paste multiple buses at once! Format: <code>Bus Number, Route Stops, Driver Name, Phone</code>
+          </p>
+          <textarea id="bulkBusesInput" rows="4" placeholder="Bus #05, Model Town -> Civil Lines, Driver Manoj, 9812345678
+Bus #06, Rosewood Enclave -> Sunshine Heights, Driver Vikram, 9823456789
+Bus #07, Highway Express -> City Center" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-mono focus:ring-2 focus:ring-amber-500 focus:outline-none custom-scroll"></textarea>
+          <div class="flex items-center justify-between pt-1">
+            <span class="text-[10px] text-slate-500">Duplicates will be skipped automatically.</span>
+            <button type="button" onclick="handleBulkAddBuses()" class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-black text-xs rounded-lg shadow transition flex items-center gap-1.5 cursor-pointer">
+              <span>🚀</span> Import Bus List
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Fleet Roster List -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+            <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider">Active Bus Fleet Roster</h4>
+            <span class="text-[11px] font-bold text-amber-800" id="busesModalFleetCount">0 buses</span>
+          </div>
+          <div id="busesListContainer" class="space-y-2 max-h-72 overflow-y-auto custom-scroll pr-1">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-3 border-t border-slate-100 flex items-center justify-end bg-slate-50 shrink-0">
+        <button type="button" onclick="closeBusesModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: SCHOOLS DIRECTORY MANAGEMENT                     -->
+  <!-- ======================================================== -->
+  <div id="schoolsModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-sky-50 to-indigo-50 shrink-0">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🏫</span>
+          <div>
+            <h3 class="text-base font-black text-slate-800">Schools Directory & Fleet Management</h3>
+            <p class="text-xs text-slate-500">Manage multiple schools served by RAM RAM JI TRANSPORT</p>
+          </div>
+        </div>
+        <button onclick="closeSchoolsModal()" class="text-slate-400 hover:text-slate-600 text-2xl font-bold p-1 cursor-pointer">&times;</button>
+      </div>
+
+      <div class="p-6 overflow-y-auto custom-scroll space-y-5 flex-1">
+        <!-- Add New School Form -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+          <div class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center justify-between">
+            <span class="flex items-center gap-1.5"><span>➕</span> <span id="schoolFormTitle">Add New School</span></span>
+            <button type="button" id="cancelSchoolEditBtn" onclick="resetSchoolForm()" class="hidden text-[11px] font-bold text-slate-500 hover:text-slate-800 underline cursor-pointer">Cancel Edit</button>
+          </div>
+          <input type="hidden" id="schoolEditId" value="">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2">
+              <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">School Full Name *</label>
+              <input type="text" id="newSchoolName" placeholder="e.g. Cambridge International School" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">Short Code *</label>
+              <input type="text" id="newSchoolCode" placeholder="e.g. CIS or DPS" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-bold uppercase focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">Campus Address / Branch</label>
+              <input type="text" id="newSchoolAddress" placeholder="e.g. Model Town / GT Road Campus" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-slate-700 uppercase mb-1">Contact Phone / Incharge</label>
+              <input type="text" id="newSchoolPhone" placeholder="e.g. 9814124392" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-sky-500 focus:outline-none">
+            </div>
+          </div>
+          <div class="flex justify-end pt-1">
+            <button type="button" id="saveSchoolBtn" onclick="handleSchoolSubmit()" class="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white font-black text-xs rounded-xl shadow transition flex items-center gap-1 cursor-pointer">
+              <span>+</span> <span id="saveSchoolBtnText">Add School</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Schools Directory List -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between pb-1 border-b border-slate-100">
+            <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider">Registered Schools</h4>
+            <span class="text-[11px] font-bold text-sky-800" id="schoolsModalCount">0 schools</span>
+          </div>
+          <div id="schoolsListContainer" class="space-y-2 max-h-72 overflow-y-auto custom-scroll pr-1">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-6 py-3 border-t border-slate-100 flex items-center justify-end bg-slate-50 shrink-0">
+        <button type="button" onclick="closeSchoolsModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: SCANNER & UPI SETTINGS                           -->
+  <!-- ======================================================== -->
+  <div id="settingsModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <h3 class="text-lg font-bold text-slate-800">Scanner & UPI Payment Settings</h3>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      </div>
+
+      <form id="settingsForm" onsubmit="handleSettingsSubmit(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto custom-scroll">
+        <!-- Integrated QR Code & Scanner Manager -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3.5">
+              <div class="relative group">
+                <img id="settingsQrPreview" src="/scanner.png" alt="Payment QR Code" class="w-24 h-24 object-contain rounded-xl border-2 border-slate-300 bg-white p-1 shadow-2xs">
+                <button type="button" onclick="document.getElementById('qrCodeFileInput').click()" class="absolute inset-0 bg-black/60 text-white rounded-xl opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center text-[10px] font-bold cursor-pointer" title="Click to change QR Code image">
+                  <span class="text-base">📷</span>
+                  <span>Change</span>
+                </button>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-emerald-800 uppercase">Payment QR Code</span>
+                  <span id="qrTypeBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    Official QR
+                  </span>
+                </div>
+                <div class="text-sm font-extrabold text-slate-900 mt-0.5" id="settingsPayeeDisplay">HIMANSHU WALIA</div>
+                <div class="text-xs font-mono text-slate-600" id="settingsUpiDisplay">himanshu1461@ptyes</div>
+                <div class="text-[11px] text-emerald-700 mt-1">✓ Scanner is active on all parent payment links.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- QR Code Action Buttons: Upload & Reset -->
+          <div class="pt-2 border-t border-slate-200/80 flex flex-wrap items-center gap-2">
+            <input type="file" id="qrCodeFileInput" accept="image/png, image/jpeg, image/jpg, image/webp" class="hidden" onchange="handleQrUpload(event)">
+            <button type="button" onclick="document.getElementById('qrCodeFileInput').click()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition flex items-center gap-1.5 cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              <span>Change / Upload QR</span>
+            </button>
+            <button type="button" id="resetQrBtn" onclick="resetQrToGenerated()" class="px-3 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer" title="Reset to auto-generated official UPI QR code">
+              <span>🔄</span>
+              <span>Reset Default</span>
+            </button>
+            <span id="qrUploadStatus" class="text-xs text-slate-500 font-medium"></span>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Your UPI ID (VPA) *</label>
+          <input type="text" id="settingsUpiId" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Business / Payee Name *</label>
+          <input type="text" id="settingsBusinessName" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Proprietor Name</label>
+          <input type="text" id="settingsProprietorName" placeholder="LALIT KUMAR WALIA" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Owner Contact Phone</label>
+          <input type="text" id="settingsOwnerPhone" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <!-- Bank Account Link & Quick Summary -->
+        <div class="bg-indigo-50/70 border border-indigo-200 rounded-2xl p-3.5 flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <span class="text-xl">🏦</span>
+            <div>
+              <div class="text-xs font-black text-indigo-950 uppercase tracking-wide">School Transport Bank Account</div>
+              <div class="text-[11px] text-indigo-800" id="settingsBankSummary">YES Bank • 14610100012345 (HIMANSHU WALIA)</div>
+            </div>
+          </div>
+          <button type="button" onclick="closeSettingsModal(); openBankModal();" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-xs transition cursor-pointer">
+            Edit Bank
+          </button>
+        </div>
+
+        <!-- Admin Login Credentials Section -->
+        <div class="bg-amber-50/70 border-2 border-amber-200 rounded-2xl p-4 space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🔐</span>
+            <div>
+              <div class="text-xs font-black text-amber-950 uppercase tracking-wide">Admin Login Credentials</div>
+              <div class="text-[11px] text-amber-800">Set username & password for administrator dashboard access</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Admin Username</label>
+              <input type="text" id="settingsAdminUsername" placeholder="admin" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">New Password</label>
+              <input type="password" id="settingsAdminNewPassword" placeholder="Leave blank to keep current" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-amber-500 focus:outline-none">
+            </div>
+          </div>
+          <p class="text-[10px] text-amber-800">Current default is <code>admin</code> / <code>admin123</code>. Only enter a new password if you want to change it.</p>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeSettingsModal()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-lg transition">Cancel</button>
+          <button type="submit" class="px-5 py-2 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition shadow-sm">Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: BANK ACCOUNT MANAGEMENT                           -->
+  <!-- ======================================================== -->
+  <div id="bankModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-indigo-50 to-blue-50">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">🏦</span>
+          <div>
+            <h3 class="text-base font-black text-slate-800">School Transport Bank Account</h3>
+            <p class="text-[11px] text-slate-500">Official account for parent NEFT / IMPS / RTGS direct transfers</p>
+          </div>
+        </div>
+        <button onclick="closeBankModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1 cursor-pointer">&times;</button>
+      </div>
+
+      <form id="bankForm" onsubmit="handleBankSubmit(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto custom-scroll">
+        <!-- Live Preview Card of Bank Account as Seen by Parents -->
+        <div class="bg-gradient-to-br from-indigo-900 via-blue-900 to-slate-900 text-white p-5 rounded-2xl shadow-md space-y-3 relative overflow-hidden">
+          <div class="absolute -right-4 -bottom-4 text-7xl opacity-10 select-none">🏦</div>
+          <div class="flex items-center justify-between border-b border-white/20 pb-2">
+            <div class="text-[10px] font-black tracking-wider uppercase text-indigo-200">Official Transport Account</div>
+            <span class="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full">✓ Verified Payee</span>
+          </div>
+          <div>
+            <div class="text-[11px] text-indigo-200 uppercase font-semibold tracking-wider">Beneficiary Name</div>
+            <div class="text-base font-black tracking-wide" id="bankPreviewHolder">HIMANSHU WALIA</div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <div>
+              <div class="text-[10px] text-indigo-200 uppercase font-semibold">Bank Name</div>
+              <div class="text-xs font-bold" id="bankPreviewName">YES Bank</div>
+            </div>
+            <div>
+              <div class="text-[10px] text-indigo-200 uppercase font-semibold">Account Number</div>
+              <div class="text-xs font-mono font-bold tracking-wider" id="bankPreviewAcc">14610100012345</div>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-1 border-t border-white/10 text-[11px]">
+            <div>
+              <span class="text-indigo-300 font-medium">IFSC:</span> <strong class="font-mono" id="bankPreviewIfsc">YESB0000146</strong>
+            </div>
+            <div class="text-right truncate">
+              <span class="text-indigo-300 font-medium" id="bankPreviewType">Current Account • Civil Lines</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bank Details Input Fields -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Bank Name *</label>
+            <input type="text" id="bankNameInput" required placeholder="e.g. YES Bank / SBI / HDFC" oninput="updateBankModalPreview()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Beneficiary / Account Name *</label>
+            <input type="text" id="bankAccountNameInput" required placeholder="e.g. HIMANSHU WALIA" oninput="updateBankModalPreview()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Account Number *</label>
+            <input type="text" id="bankAccountNumberInput" required placeholder="e.g. 14610100012345" oninput="updateBankModalPreview()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-mono font-bold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">IFSC Code *</label>
+            <input type="text" id="bankIfscInput" required placeholder="e.g. YESB0000146" oninput="this.value = this.value.toUpperCase(); updateBankModalPreview();" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-mono font-bold uppercase text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Account Type</label>
+            <select id="bankAccountTypeInput" onchange="updateBankModalPreview()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white">
+              <option value="Current Account">Current Account</option>
+              <option value="Savings Account">Savings Account</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Branch Name</label>
+            <input type="text" id="bankBranchInput" placeholder="e.g. Civil Lines Branch" oninput="updateBankModalPreview()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Information notice -->
+        <div class="p-3 bg-indigo-50/70 border border-indigo-200 rounded-xl text-[11px] text-indigo-900 space-y-1">
+          <div class="font-bold flex items-center gap-1">
+            <span>💡</span> <span>How Parents Use This:</span>
+          </div>
+          <p class="text-[10px] text-indigo-800 leading-relaxed">
+            When parents visit <code>/pay</code>, they can choose either <strong>"🛡️ QR Scanner / UPI"</strong> or <strong>"🏦 Bank Account Transfer"</strong>. In Bank Transfer mode, these exact details appear with 1-click copy buttons for instant IMPS / NEFT transfer from their banking app.
+          </p>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeBankModal()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer">Cancel</button>
+          <button type="submit" class="px-5 py-2.5 text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-md transition cursor-pointer flex items-center gap-1.5">
+            <span>💾 Save Bank Account</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: EDIT FIXED MONTHLY FEE                            -->
+  <!-- ======================================================== -->
+  <div id="feeModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-emerald-50 to-teal-50">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">💰</span>
+          <div>
+            <h3 class="text-base font-black text-slate-800">Edit Fixed Monthly Fee</h3>
+            <p class="text-[11px] text-slate-500" id="feeModalSubtitle">Change recurring fee amount for student</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeFeeModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1 cursor-pointer">&times;</button>
+      </div>
+
+      <form id="feeModalForm" onsubmit="handleFeeModalSubmit(event)" class="p-6 space-y-4">
+        <input type="hidden" id="feeModalStudentId">
+
+        <!-- Student summary banner -->
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between">
+          <div>
+            <div class="text-xs font-black text-slate-800" id="feeModalStudentName">Student Name</div>
+            <div class="text-[11px] text-slate-500 font-semibold" id="feeModalStudentMeta">Bus S3 • Police DAV Public School</div>
+          </div>
+          <div class="text-right">
+            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Current Fee</div>
+            <div class="text-sm font-black text-emerald-700" id="feeModalCurrentFeeDisplay">₹2,310</div>
+          </div>
+        </div>
+
+        <!-- New Fee Amount Input -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">New Fixed Monthly Fee (₹) *</label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 font-black text-base">₹</span>
+            <input type="number" id="feeModalAmountInput" required min="0" step="10" placeholder="e.g. 2500" class="w-full pl-8 pr-4 py-2.5 border-2 border-emerald-300 rounded-xl text-base font-black text-emerald-800 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200 bg-emerald-50/30">
+          </div>
+        </div>
+
+        <!-- Quick Presets -->
+        <div>
+          <div class="text-[11px] font-bold text-slate-500 mb-1.5">Quick Presets:</div>
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" onclick="setFeePreset(2000)" class="px-2.5 py-1 text-xs font-bold bg-slate-100 hover:bg-emerald-100 hover:text-emerald-800 text-slate-700 rounded-lg transition border border-slate-200 cursor-pointer">₹2,000</button>
+            <button type="button" onclick="setFeePreset(2200)" class="px-2.5 py-1 text-xs font-bold bg-slate-100 hover:bg-emerald-100 hover:text-emerald-800 text-slate-700 rounded-lg transition border border-slate-200 cursor-pointer">₹2,200</button>
+            <button type="button" onclick="setFeePreset(2310)" class="px-2.5 py-1 text-xs font-bold bg-slate-100 hover:bg-emerald-100 hover:text-emerald-800 text-slate-700 rounded-lg transition border border-slate-200 cursor-pointer">₹2,310</button>
+            <button type="button" onclick="setFeePreset(2400)" class="px-2.5 py-1 text-xs font-bold bg-slate-100 hover:bg-emerald-100 hover:text-emerald-800 text-slate-700 rounded-lg transition border border-slate-200 cursor-pointer">₹2,400</button>
+            <button type="button" onclick="setFeePreset(2500)" class="px-2.5 py-1 text-xs font-bold bg-slate-100 hover:bg-emerald-100 hover:text-emerald-800 text-slate-700 rounded-lg transition border border-slate-200 cursor-pointer">₹2,500</button>
+            <button type="button" onclick="setFeePreset(2800)" class="px-2.5 py-1 text-xs font-bold bg-slate-100 hover:bg-emerald-100 hover:text-emerald-800 text-slate-700 rounded-lg transition border border-slate-200 cursor-pointer">₹2,800</button>
+            <button type="button" onclick="setFeePreset(3000)" class="px-2.5 py-1 text-xs font-bold bg-slate-100 hover:bg-emerald-100 hover:text-emerald-800 text-slate-700 rounded-lg transition border border-slate-200 cursor-pointer">₹3,000</button>
+          </div>
+        </div>
+
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
+          <div class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+            <span>✓</span> <span>Applies to Current & Upcoming Months</span>
+          </div>
+          <p class="text-[11px] text-emerald-800 leading-relaxed">
+            Changing the fixed fee automatically updates this child's bus fee for the <strong>current month (September 2026) and ALL upcoming months (October 2026 – March 2027)</strong>, as well as the QR code payment amount on the parent portal. Past cleared months (April–August) remain untouched.
+          </p>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeFeeModal()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition cursor-pointer">Cancel</button>
+          <button type="submit" id="feeModalSaveBtn" class="px-5 py-2.5 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md transition cursor-pointer flex items-center gap-1.5">
+            <span>💾 Save Fixed Fee</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CLUB SIBLINGS TOGETHER                            -->
+  <!-- ======================================================== -->
+  <div id="clubSiblingsModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-indigo-50/80">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">👨‍👩‍👧‍👦</span>
+          <div>
+            <h3 class="text-base font-black text-indigo-950">Club Siblings (Pay Together)</h3>
+            <p class="text-xs text-indigo-800">Link 2 or more students so parents can pay for all together with 1 QR code</p>
+          </div>
+        </div>
+        <button onclick="closeClubSiblingsModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      </div>
+
+      <div class="p-6 space-y-4 max-h-[80vh] overflow-y-auto custom-scroll">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Family / Group Name (Optional)</label>
+          <input type="text" id="clubGroupNameInput" placeholder="e.g. Verma Family or Sharma Siblings" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+        </div>
+
+        <div>
+          <div class="flex justify-between items-center mb-1.5">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Select Students to Club Together *</label>
+            <span class="text-[11px] font-bold text-indigo-700" id="clubSelectedCount">0 selected</span>
+          </div>
+          <input type="text" id="clubSearchStudentInput" oninput="filterClubStudentsList()" placeholder="Quick filter by student name..." class="w-full px-3 py-1.5 border border-slate-300 rounded-lg text-xs mb-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+
+          <div id="clubStudentsCheckboxList" class="max-h-60 overflow-y-auto border border-slate-200 rounded-xl p-2 space-y-1 bg-slate-50">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeClubSiblingsModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition">
+            Cancel
+          </button>
+          <button type="button" onclick="executeClubSiblings()" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-xl shadow-md transition">
+            ✓ Club Selected Siblings
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: EDIT PAYMENT STATUS                               -->
+  <!-- ======================================================== -->
+  <div id="statusModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-emerald-50/80">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">💳</span>
+          <div>
+            <h3 class="text-base font-black text-slate-900">Edit Payment Status</h3>
+            <p class="text-xs text-emerald-800" id="statusModalStudentSubtitle">Student Details</p>
+          </div>
+        </div>
+        <button onclick="closeStatusModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+      </div>
+
+      <form id="statusForm" onsubmit="handleStatusSubmit(event)" class="p-6 space-y-4">
+        <input type="hidden" id="statusModalStudentId" value="">
+
+        <!-- Student Summary Banner -->
+        <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+          <div>
+            <div class="font-extrabold text-slate-900 text-sm" id="statusModalStudentName">Student Name</div>
+            <div class="text-xs text-slate-500 mt-0.5" id="statusModalStudentMeta">Bus S3 • Route Stop</div>
+          </div>
+          <div class="text-right">
+            <div class="text-[10px] text-slate-400 uppercase font-bold">Monthly Fee</div>
+            <div class="text-base font-black text-emerald-700" id="statusModalStudentFee">₹0</div>
+          </div>
+        </div>
+
+        <!-- Target Billing Month -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Fee Month To Update *</label>
+          <select id="statusModalMonthSelect" onchange="handleStatusModalMonthChange()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <!-- FY months populated dynamically -->
+          </select>
+          <div id="statusModalPastDueHint" class="hidden text-[11px] text-rose-700 font-bold mt-1.5 flex items-center gap-1">
+            <span>⚠️</span> <span>Prior unpaid due detected! Selected earliest unpaid month first.</span>
+          </div>
+        </div>
+
+        <!-- Payment Status Selection -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Select New Status *</label>
+          <div class="grid grid-cols-1 gap-2">
+            <!-- Option 1: Paid & Verified -->
+            <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-emerald-50/50 transition has-[:checked]:border-emerald-500 has-[:checked]:bg-emerald-50/80 has-[:checked]:ring-1 has-[:checked]:ring-emerald-500">
+              <input type="radio" name="paymentStatusOption" value="paid" class="text-emerald-600 focus:ring-emerald-500" required>
+              <div class="flex-1">
+                <div class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
+                  <span>✓ Paid & Verified</span>
+                  <span class="text-[10px] font-bold px-1.5 py-0.2 bg-emerald-200 text-emerald-800 rounded">Issues Receipt</span>
+                </div>
+                <div class="text-[11px] text-slate-500">Unlocks official stamped receipt on parent's screen</div>
+              </div>
+            </label>
+
+            <!-- Option 2: Submitted / Awaiting Check -->
+            <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-blue-50/50 transition has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50/80 has-[:checked]:ring-1 has-[:checked]:ring-blue-500">
+              <input type="radio" name="paymentStatusOption" value="submitted" class="text-blue-600 focus:ring-blue-500">
+              <div class="flex-1">
+                <div class="text-xs font-black text-blue-900">⏳ Awaiting Verification (Submitted)</div>
+                <div class="text-[11px] text-slate-500">Shows "Payment Under Review" to parent</div>
+              </div>
+            </label>
+
+            <!-- Option 3: Pending / Unpaid -->
+            <label class="flex items-center gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-rose-50/50 transition has-[:checked]:border-rose-500 has-[:checked]:bg-rose-50/80 has-[:checked]:ring-1 has-[:checked]:ring-rose-500">
+              <input type="radio" name="paymentStatusOption" value="pending" class="text-rose-600 focus:ring-rose-500">
+              <div class="flex-1">
+                <div class="text-xs font-black text-rose-900">⚠️ Unpaid / Pending</div>
+                <div class="text-[11px] text-slate-500">Displays unpaid bill and payment QR code to parent</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Payment Mode & Reference -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Payment Method</label>
+            <select id="statusPaymentMethod" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <option value="Google Pay">Google Pay (GPay)</option>
+              <option value="PhonePe">PhonePe</option>
+              <option value="Paytm">Paytm</option>
+              <option value="Cash / Offline">Cash / Handed to Driver</option>
+              <option value="Bank Transfer">Bank Transfer / NEFT</option>
+              <option value="Cheque">Cheque</option>
+              <option value="Other">Other Mode</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Payer Name / Number</label>
+            <input type="text" id="statusPayerInfo" placeholder="e.g. Sunita Verma or 981412..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Reference / Receipt Note -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Notes / Transaction Reference (Optional)</label>
+          <input type="text" id="statusPaymentRef" placeholder="e.g. Cash collected by driver or UTR..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <!-- Sibling Sync Notice (if linked) -->
+        <div id="statusSiblingBox" class="hidden p-3 bg-indigo-50 border border-indigo-200 rounded-xl">
+          <label class="flex items-start gap-2.5 cursor-pointer">
+            <input type="checkbox" id="statusUpdateSiblings" class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500">
+            <div>
+              <div class="text-xs font-bold text-indigo-950">Also update sibling(s)</div>
+              <div class="text-[11px] text-indigo-800" id="statusSiblingText">Sibling Name</div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeStatusModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition">
+            Cancel
+          </button>
+          <button type="submit" id="saveStatusBtn" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl shadow-md transition">
+            ✓ Save Payment Status
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: ADD / RECORD CASH PAYMENT                         -->
+  <!-- ======================================================== -->
+  <div id="cashModal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-emerald-600 text-white">
+        <div class="flex items-center gap-2.5">
+          <span class="text-2xl">💵</span>
+          <div>
+            <h3 class="text-base font-black">Record Cash Payment</h3>
+            <p class="text-xs text-emerald-100">Collect fee in cash & immediately issue verified receipt</p>
+          </div>
+        </div>
+        <button onclick="closeCashModal()" class="text-white/80 hover:text-white text-2xl font-bold">&times;</button>
+      </div>
+
+      <form id="cashPaymentForm" onsubmit="handleCashSubmit(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto custom-scroll">
+        <!-- Student Selection -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Select Student *</label>
+          <select id="cashStudentSelect" onchange="handleCashStudentChange()" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none" required>
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <!-- Student & Parent Live Info Card -->
+        <div id="cashStudentInfoCard" class="p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-emerald-950" id="cashInfoStudentName">Selected Student</span>
+            <span class="text-xs font-bold px-2 py-0.5 rounded bg-emerald-200 text-emerald-900" id="cashInfoAmountBadge">₹2,310</span>
+          </div>
+          <div class="text-xs text-slate-600 flex items-center gap-1.5">
+            <span>👨‍👩‍👧 Parent:</span>
+            <strong class="text-slate-900" id="cashInfoParentName">Parent Name</strong>
+            <span class="text-slate-400">•</span>
+            <span class="font-mono text-slate-700" id="cashInfoParentPhone">Phone</span>
+          </div>
+          <div class="text-[11px] text-slate-500 flex items-center gap-1">
+            <span>🚌</span> <span id="cashInfoBusRoute">Bus S3 • Stop</span>
+          </div>
+          <div class="text-[11px] font-bold text-emerald-800 flex items-center gap-1 pt-0.5">
+            <span>⚡</span> <span>Automatic Verification: Managed & recorded by Transport Admin</span>
+          </div>
+        </div>
+
+        <!-- Prior Due Alert for Cash Modal -->
+        <div id="cashDueAlertCard" class="hidden p-3 bg-rose-50 border border-rose-200 rounded-xl space-y-1 animate-in fade-in">
+          <div class="flex items-center gap-1.5 text-xs font-black text-rose-900">
+            <span>⚠️</span> <span>Prior Unpaid Month Detected!</span>
+          </div>
+          <p class="text-[11px] text-rose-700 font-medium">
+            This student has unpaid dues from an earlier cycle. Automatically clearing fee for <strong id="cashDueAlertMonth" class="text-rose-950 underline font-black"></strong> first.
+          </p>
+        </div>
+
+        <!-- Month & Amount -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Fee Month (FY 2026-27) *</label>
+            <select id="cashMonthSelect" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <!-- FY months populated dynamically -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Cash Amount (₹) *</label>
+            <input type="number" id="cashAmountInput" required min="0" step="1" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-black text-emerald-700 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          </div>
+        </div>
+
+        <!-- Collector & Payer Name -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Received / Collected By *</label>
+            <select id="cashCollectorSelect" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold bg-slate-50 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <option value="Admin (Himanshu Walia)" selected>Admin (Himanshu Walia) — Automatic</option>
+              <option value="Transport Owner">Transport Owner</option>
+              <option value="Bus Driver">Bus Driver</option>
+              <option value="Bus Conductor">Bus Conductor</option>
+              <option value="School Transport Office">School Transport Office</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Parent Name / Payer *</label>
+            <input type="text" id="cashPayerNameInput" placeholder="e.g. Handed by Mr. Sharma (Father)" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none" required>
+          </div>
+        </div>
+
+        <!-- Optional Cash Receipt / Voucher -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Cash Receipt / Voucher No. (Optional)</label>
+          <input type="text" id="cashVoucherInput" placeholder="e.g. CASH-SEP-001" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+
+        <!-- Sibling Sync Notice (if linked) -->
+        <div id="cashSiblingBox" class="hidden p-3 bg-indigo-50 border border-indigo-200 rounded-xl">
+          <label class="flex items-start gap-2.5 cursor-pointer">
+            <input type="checkbox" id="cashUpdateSiblings" class="mt-0.5 rounded text-indigo-600 focus:ring-indigo-500" checked>
+            <div>
+              <div class="text-xs font-bold text-indigo-950">Also record cash for sibling(s)</div>
+              <div class="text-[11px] text-indigo-800" id="cashSiblingText">Sibling Name</div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+          <button type="button" onclick="closeCashModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition">
+            Cancel
+          </button>
+          <button type="submit" id="confirmCashBtn" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl shadow-md transition">
+            ✓ Confirm Cash Received
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: STOP TRANSPORT SERVICE / STUDENT LEFT MANAGER     -->
+  <!-- ======================================================== -->
+  <div id="stopServiceModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in flex flex-col max-h-[90vh]">
+      <!-- Header -->
+      <div class="px-6 py-4 border-b border-rose-700 flex items-center justify-between bg-gradient-to-r from-rose-600 to-rose-700 text-white shrink-0">
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">🛑</span>
+          <div>
+            <h3 class="text-base font-black leading-tight">Student Departure & Stop Fee Manager</h3>
+            <p class="text-xs text-rose-100">Discontinue transport for students who left school or bus service</p>
+          </div>
+        </div>
+        <button onclick="closeStopServiceModal()" class="text-white/80 hover:text-white text-2xl font-bold p-1 cursor-pointer">&times;</button>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="flex border-b border-slate-200 bg-slate-50 shrink-0 px-6 pt-3 gap-2">
+        <button type="button" id="stopTabBtnAction" onclick="switchStopModalTab('action')" class="px-4 py-2 text-xs font-black border-b-2 border-rose-600 text-rose-700 transition flex items-center gap-1.5 cursor-pointer">
+          <span>🛑 Stop Fees for a Student</span>
+        </button>
+        <button type="button" id="stopTabBtnList" onclick="switchStopModalTab('list')" class="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5 cursor-pointer">
+          <span>📋 Discontinued Students</span>
+          <span id="stopModalLeftBadge" class="px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 text-[10px] font-black">0</span>
+        </button>
+      </div>
+
+      <!-- Content Container -->
+      <div class="p-6 overflow-y-auto custom-scroll flex-1">
+        <!-- TAB 1: ACTION / STOP FEE FORM -->
+        <form id="stopServiceForm" onsubmit="handleStopServiceSubmit(event)" class="space-y-4">
+          <input type="hidden" id="stopStudentId">
+
+          <!-- Student Selection Dropdown -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+              Select Student to Stop Fees *
+            </label>
+            <select id="stopStudentSelect" onchange="handleStopStudentSelectChange()" class="w-full px-3 py-2.5 border-2 border-slate-300 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-800 focus:ring-2 focus:ring-rose-500 focus:outline-none cursor-pointer" required>
+              <option value="">-- Choose a student from roster --</option>
+            </select>
+          </div>
+
+          <!-- Student Info Preview Card -->
+          <div id="stopStudentInfoCard" class="p-3.5 bg-rose-50/80 border border-rose-200 rounded-2xl space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-rose-950" id="stopInfoStudentName">Please select a student above</span>
+              <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-rose-200 text-rose-900" id="stopInfoMonthlyFee">₹0/mo</span>
+            </div>
+            <div class="text-xs text-slate-600 flex items-center gap-1.5 flex-wrap">
+              <span>👨‍👩‍👧 Parent:</span>
+              <strong class="text-slate-900" id="stopInfoParentName">-</strong>
+              <span class="text-slate-400">•</span>
+              <span class="font-mono text-slate-700" id="stopInfoParentPhone">-</span>
+            </div>
+            <div class="text-[11px] text-slate-500 flex items-center gap-1">
+              <span>🚌</span> <span id="stopInfoBusRoute">-</span>
+            </div>
+          </div>
+
+          <!-- Prior Dues Warning (if any) -->
+          <div id="stopPriorDuesAlert" class="hidden p-3.5 bg-amber-50 border border-amber-300 rounded-2xl space-y-1 animate-in fade-in">
+            <div class="flex items-center gap-1.5 text-xs font-black text-amber-900">
+              <span>⚠️</span> <span>Prior Unpaid Months Detected!</span>
+            </div>
+            <p class="text-[11px] text-amber-800 font-medium" id="stopPriorDuesText">
+              Student has unpaid dues prior to departure. Under school transport rules, prior unpaid months remain collectible until cleared. Upcoming months from your selected departure month will have zero fee obligation.
+            </p>
+          </div>
+
+          <!-- Stop Fee Starting Month & Reason Preset -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Stop Fee Starting From Month *
+              </label>
+              <select id="stopFromMonthSelect" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:ring-2 focus:ring-rose-500 focus:outline-none bg-white" required>
+                <!-- FY months populated dynamically -->
+              </select>
+              <p class="text-[10px] text-slate-500 mt-1">Starting from this month onward, monthly fee is set to ₹0.</p>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                Reason Preset
+              </label>
+              <select id="stopReasonPreset" onchange="handleStopReasonPreset(this.value)" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:ring-2 focus:ring-rose-500 focus:outline-none bg-white">
+                <option value="">Select a reason or type below...</option>
+                <option value="Left school / TC issued">Left school / TC issued</option>
+                <option value="Shifted residence / address changed">Shifted residence / address changed</option>
+                <option value="Opted for private / self transport">Opted for private / self transport</option>
+                <option value="Walking / bicycle distance now">Walking / bicycle distance now</option>
+                <option value="Temporary leave / parent request">Temporary leave / parent request</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Custom Reason / Notes -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+              Custom Notes or Reason Details (Optional)
+            </label>
+            <input type="text" id="stopReasonInput" placeholder="e.g. TC issued on 15th, shifted to new locality..." class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs focus:ring-2 focus:ring-rose-500 focus:outline-none">
+          </div>
+
+          <!-- Explanatory Box -->
+          <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] text-slate-600 space-y-1">
+            <div class="font-bold text-slate-800 flex items-center gap-1">
+              <span>ℹ️</span> <span>How Stopping Fees Works:</span>
+            </div>
+            <ul class="list-disc pl-4 space-y-0.5 text-[10px]">
+              <li>Fee is automatically set to ₹0 for departure month and all future months.</li>
+              <li>Expected & Pending revenue KPI figures immediately deduct this student.</li>
+              <li>Student is badged as <strong>🛑 Left from [Month]</strong> in the roster.</li>
+              <li>Can be reactivated back to active transport at any time with 1 click.</li>
+            </ul>
+          </div>
+
+          <!-- Actions -->
+          <div class="pt-3 flex items-center justify-end gap-2 border-t border-slate-100">
+            <button type="button" onclick="closeStopServiceModal()" class="px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-100 transition cursor-pointer">
+              Cancel
+            </button>
+            <button type="submit" id="confirmStopBtn" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-black rounded-xl shadow-md transition flex items-center gap-1.5 cursor-pointer">
+              <span>🛑 Stop Upcoming Fees</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- TAB 2: LIST OF CURRENTLY LEFT STUDENTS -->
+        <div id="stopModalListView" class="hidden space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">Currently Discontinued Students</h4>
+            <button onclick="switchStopModalTab('action')" class="text-xs font-bold text-rose-600 hover:text-rose-800 hover:underline cursor-pointer">
+              + Stop Fees for Another Student
+            </button>
+          </div>
+          <div id="modalLeftStudentsContainer" class="space-y-2">
+            <!-- Rendered dynamically in admin.js -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE & WI-FI PHONE ACCESS MODAL (HTTPS & WI-FI) -->
+  <div id="wifiModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-4 text-center max-h-[90vh] overflow-y-auto custom-scroll">
+      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div class="flex items-center gap-2 text-left">
+          <span class="text-2xl">📱</span>
+          <div>
+            <h3 class="font-black text-slate-800 text-base">Open & Pay on Mobile Phone</h3>
+            <p class="text-[11px] text-slate-500">Official SSL Secure Link & Local Wi-Fi Access</p>
+          </div>
+        </div>
+        <button onclick="closeWifiModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold p-1 cursor-pointer">✕</button>
+      </div>
+
+      <!-- Scannable QR Card -->
+      <div class="bg-gradient-to-b from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 flex flex-col items-center">
+        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-950 text-[11px] font-black mb-2">
+          <span>🔒</span> 100% SSL Secure • No Mobile Warnings
+        </div>
+        <div class="text-xs font-bold text-slate-800 mb-2">Scan with Phone Camera to Open Parent Portal</div>
+        <img id="wifiQrImage" src="" alt="Secure Parent Portal QR" class="w-48 h-48 rounded-xl shadow-md bg-white p-2 border border-slate-200">
+        <span class="text-[10px] text-emerald-800 mt-2 font-bold">Opens securely in Chrome / Safari with full 🔒 SSL encryption</span>
+      </div>
+
+      <!-- Secure HTTPS Link (Primary) -->
+      <div id="httpsBox" class="space-y-2 text-left">
+        <div class="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-300">
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-[10px] font-black text-emerald-950 uppercase tracking-wider flex items-center gap-1">
+              <span>🔒</span> Official Secure HTTPS Link (Recommended)
+            </label>
+            <span class="text-[10px] font-black bg-emerald-200 text-emerald-900 px-2 py-0.5 rounded-full">Safe for UPI</span>
+          </div>
+          <div class="flex items-center justify-between mt-1 gap-2">
+            <span id="secureParentUrlText" class="text-xs font-mono font-black text-emerald-800 break-all select-all">Loading...</span>
+            <button onclick="copySecureParentLink()" class="shrink-0 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow transition cursor-pointer">Copy</button>
+          </div>
+          <p class="text-[10px] text-emerald-700 mt-1.5">✓ Works from phone cellular data (4G/5G) or Wi-Fi without any "Not Secure" warnings.</p>
+        </div>
+
+        <!-- Local Wi-Fi Router Link (Secondary) -->
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider">Local Wi-Fi Router Link (Parents on Wi-Fi)</label>
+          <div class="flex items-center justify-between mt-1 gap-2">
+            <span id="wifiParentUrlText" class="text-xs font-mono font-bold text-slate-700 break-all select-all">Loading...</span>
+            <button onclick="copyWifiParentLink()" class="shrink-0 px-2.5 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 text-[11px] font-bold rounded-lg transition cursor-pointer">Copy</button>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-1">Direct LAN address on your Wi-Fi network.</p>
+        </div>
+
+        <!-- Admin Wi-Fi Dashboard Link -->
+        <div class="bg-indigo-50/70 p-3 rounded-xl border border-indigo-200">
+          <label class="block text-[10px] font-black text-indigo-950 uppercase tracking-wider flex items-center gap-1">
+            <span>👑</span> Admin Dashboard Link (For Administrator's Phone)
+          </label>
+          <div class="flex items-center justify-between mt-1 gap-2">
+            <span id="wifiAdminUrlText" class="text-xs font-mono font-bold text-indigo-800 break-all select-all">Loading...</span>
+            <button onclick="copyWifiAdminLink()" class="shrink-0 px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold rounded-lg transition cursor-pointer">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Security Guidance -->
+      <div class="bg-amber-50 border border-amber-200 text-amber-950 text-[11px] rounded-xl p-3 text-left leading-relaxed">
+        🛡️ <strong>Why phones show "Not Secure":</strong> Mobile browsers flag any raw <code>http://</code> IP address as unencrypted. Opening via the <strong>🔒 HTTPS Link above</strong> provides an authenticated SSL certificate, eliminating all warnings and enabling fast 1-tap UPI app launching!
+      </div>
+    </div>
+  </div>
+
+  <script src="/admin.js"></script>
+</body>
+</html>

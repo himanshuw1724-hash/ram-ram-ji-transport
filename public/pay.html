@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Bus Fee Payment Portal</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    .custom-scroll::-webkit-scrollbar { width: 5px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .app-chip {
+      background-color: #f8fafc;
+      border-color: #e2e8f0;
+      color: #475569;
+      cursor: pointer;
+      user-select: none;
+    }
+    .app-chip.active-chip {
+      background-color: #ecfdf5;
+      border-color: #10b981;
+      color: #065f46;
+      box-shadow: 0 1px 2px 0 rgba(16, 185, 129, 0.2);
+    }
+    @media print {
+      @page {
+        margin: 10mm;
+        size: auto;
+      }
+      body {
+        background: white !important;
+        color: black !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-border-none {
+        border: none !important;
+        box-shadow: none !important;
+      }
+      
+      /* Robust Print Job Isolation: when printing a receipt, hide all page content and show only printContainer */
+      body.has-print-job > *:not(#printContainer) {
+        display: none !important;
+      }
+      body.has-print-job > #printContainer {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        padding: 16px !important;
+        background: white !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between p-3 sm:p-6">
+
+  <!-- Header -->
+  <header class="max-w-md md:max-w-3xl lg:max-w-5xl mx-auto w-full mb-3 no-print text-center">
+    <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-amber-500 text-white text-2xl shadow-md shadow-amber-200 mb-1.5">
+      🚌
+    </div>
+    <h1 id="portalBusinessTitle" class="text-xl sm:text-2xl font-black text-slate-800">RAM RAM JI TRANSPORT</h1>
+    <p class="text-xs sm:text-sm font-semibold text-slate-500 mt-0.5">Proprietor: <span class="text-emerald-700 font-bold" id="portalProprietor">LALIT KUMAR WALIA</span> • School Bus Fleet</p>
+  </header>
+
+  <!-- HTTPS Security Notice (Displayed when accessed over plain HTTP if HTTPS is available) -->
+  <div id="httpSecurityNotice" class="max-w-md md:max-w-3xl lg:max-w-5xl mx-auto w-full mb-3 hidden p-3 sm:p-4 bg-emerald-50 border border-emerald-300 rounded-2xl flex items-center justify-between gap-3 text-left shadow-xs no-print">
+    <div class="flex items-center gap-2.5">
+      <span class="text-2xl">🔒</span>
+      <div>
+        <div class="text-xs font-black text-emerald-950 flex items-center gap-1">
+          <span>Official Secure HTTPS Available</span>
+          <span class="text-[9px] font-bold bg-emerald-200 text-emerald-900 px-1.5 py-0.2 rounded">Zero Warnings</span>
+        </div>
+        <div class="text-[11px] text-emerald-800">Tap to switch to the encrypted SSL link on your mobile phone</div>
+      </div>
+    </div>
+    <a id="httpSwitchBtn" href="#" class="shrink-0 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black rounded-xl shadow-xs transition flex items-center gap-1">
+      <span>Switch</span> →
+    </a>
+  </div>
+
+  <!-- Main Card Container -->
+  <main class="max-w-md md:max-w-3xl lg:max-w-5xl mx-auto w-full bg-white rounded-3xl shadow-xl shadow-slate-200/70 border border-slate-200/80 overflow-hidden print-border-none">
+
+    <!-- STEP PROGRESS INDICATOR -->
+    <div id="stepIndicator" class="bg-slate-100/80 px-5 py-3.5 border-b border-slate-200 no-print">
+      <div class="max-w-md mx-auto flex items-center justify-between text-xs font-bold">
+        <div id="stepTab1" class="flex items-center gap-1.5 text-amber-700 font-extrabold">
+          <span class="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px]">1</span>
+          <span>Find Child</span>
+        </div>
+        <div class="h-0.5 w-6 sm:w-10 bg-slate-300"></div>
+        <div id="stepTab2" class="flex items-center gap-1.5 text-slate-400">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-[10px]">2</span>
+          <span>Review Details</span>
+        </div>
+        <div class="h-0.5 w-6 sm:w-10 bg-slate-300"></div>
+        <div id="stepTab3" class="flex items-center gap-1.5 text-slate-400">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-[10px]">3</span>
+          <span>Scan & Pay</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- VIEW 1: SELECT BUS & CHILD                                          -->
+    <!-- ==================================================================== -->
+    <section id="viewSelectChild" class="p-5 sm:p-7 space-y-6">
+      <div class="text-center space-y-1 max-w-xl mx-auto">
+        <h2 class="text-lg sm:text-xl font-extrabold text-slate-800">Find Your Child's Bus Pass</h2>
+        <p class="text-xs sm:text-sm text-slate-500">Select school, bus number, or search student name to pay fee.</p>
+      </div>
+
+      <!-- Step A, B & C Selection Controls (Responsive 3-Col Grid) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-4xl mx-auto">
+        <!-- Step A: Select School -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+            <span>🏫</span> Step 1: Select School *
+          </label>
+          <select id="selectSchoolDropdown" onchange="handleSchoolSelect()" class="w-full px-3.5 py-3 bg-sky-50/70 border-2 border-sky-300 rounded-2xl text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:border-sky-500 focus:bg-white transition shadow-xs cursor-pointer">
+            <option value="">-- Choose Your School First --</option>
+          </select>
+        </div>
+
+        <!-- Step B: Select Bus -->
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+            <span>🚌</span> Step 2: Select Bus No. *
+          </label>
+          <select id="selectBusDropdown" onchange="handleBusSelect()" class="w-full px-3.5 py-3 bg-amber-50/50 border-2 border-amber-300 rounded-2xl text-xs sm:text-sm font-extrabold text-slate-800 focus:outline-none focus:border-amber-500 focus:bg-white transition shadow-xs cursor-pointer" disabled>
+            <option value="">👈 Step 1: Select School first to see buses</option>
+          </select>
+        </div>
+
+        <!-- Step C: Search Child in that Bus -->
+        <div id="childSearchContainer" class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+            <span>🔍</span> Step 3: Search Student
+          </label>
+          <div class="relative">
+            <input type="text" id="childSearchInput" oninput="filterChildList()" placeholder="Type student name or phone..." class="w-full pl-9 pr-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-800 focus:outline-none focus:border-amber-500 focus:bg-white transition shadow-xs">
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student Cards Selection Grid -->
+      <div id="studentCardsContainer" class="space-y-2">
+        <div id="studentCardsList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[460px] overflow-y-auto custom-scroll pr-1">
+          <!-- Populated by pay.js -->
+        </div>
+      </div>
+
+      <!-- Help Info -->
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3 text-xs text-amber-900 max-w-2xl mx-auto">
+        <span class="text-xl leading-none">💡</span>
+        <div>
+          <span class="font-bold">Not sure which bus?</span> Check your WhatsApp transport update, or select any bus above and search your child's name.
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==================================================================== -->
+    <!-- VIEW 2: BILL & BUS DETAILS OVERVIEW                                  -->
+    <!-- ==================================================================== -->
+    <section id="viewReviewDetails" class="p-5 sm:p-7 space-y-5 hidden">
+      <div class="max-w-xl mx-auto space-y-5">
+        <!-- Back / Switch child button -->
+        <button onclick="goToSelectChild()" class="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1 transition no-print">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          Change Bus / Child
+        </button>
+
+        <!-- Student Card with Prominent Bus Highlight -->
+        <div class="bg-slate-50 rounded-2xl p-5 border border-slate-200/80 space-y-3.5 shadow-xs">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider" id="cardSchoolName">School Student Transport</span>
+            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full" id="cardStatusPill">Status</span>
+          </div>
+
+          <div>
+            <div class="text-2xl font-black text-slate-900" id="cardStudentName">Child Name</div>
+            <div class="text-xs font-semibold text-slate-500 mt-0.5" id="cardClassGrade">Class & Section</div>
+          </div>
+
+          <!-- Assigned Bus Highlight -->
+          <div class="bg-gradient-to-r from-amber-100 to-amber-200/70 border-2 border-amber-300 rounded-xl p-3.5 flex items-center justify-between shadow-xs">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl">🚌</span>
+              <div>
+                <div class="text-[10px] font-bold text-amber-800 uppercase tracking-wider">Assigned Bus</div>
+                <div class="text-lg font-black text-amber-950" id="cardBusNumber">Bus #--</div>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-[10px] font-bold text-amber-800 uppercase tracking-wider">Designated Stop</div>
+              <div class="text-xs font-bold text-slate-800 max-w-[160px] truncate" id="cardRouteStop">Stop</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sibling Clubbing Option Banner -->
+        <div id="siblingNoticeCard" class="hidden bg-gradient-to-r from-amber-50 to-amber-100/70 border-2 border-amber-300 rounded-2xl p-4 space-y-3">
+          <div class="flex items-start gap-2.5">
+            <span class="text-2xl leading-none">👨‍👩‍👧‍👦</span>
+            <div>
+              <div class="text-xs font-black text-amber-950 uppercase tracking-wide">Sibling Detected in Transport</div>
+              <div class="text-xs font-semibold text-amber-900 mt-0.5" id="siblingNoticeText">
+                Shanvi Verma is also registered on Bus S3.
+              </div>
+              <div class="text-[11px] text-amber-800 mt-0.5">
+                You can pay for both children together in one single transaction!
+              </div>
+            </div>
+          </div>
+
+          <label class="flex items-center gap-3 p-3 bg-white rounded-xl border border-amber-300 shadow-xs cursor-pointer select-none hover:bg-amber-50/50 transition">
+            <input type="checkbox" id="clubSiblingsCheckbox" onchange="handleClubToggle(this.checked)" class="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500 border-slate-300">
+            <div>
+              <div class="text-xs font-black text-slate-900" id="clubCheckboxLabel">
+                ✓ Pay Together for Both Children
+              </div>
+              <div class="text-[11px] font-bold text-emerald-700" id="clubbedTotalSummary">
+                Combined Fee: ₹4,620 (₹2,310 + ₹2,310)
+              </div>
+            </div>
+          </label>
+        </div>
+
+        <!-- Prior Due Alert Banner (Shows when student owes past months) -->
+        <div id="pastDueAlertCard" class="hidden bg-rose-50 border-2 border-rose-300 rounded-2xl p-4 space-y-2 text-left">
+          <div class="flex items-start gap-2.5">
+            <span class="text-2xl leading-none">⚠️</span>
+            <div>
+              <div class="text-xs font-black text-rose-950 uppercase tracking-wide">Prior Unpaid Due Detected</div>
+              <div class="text-xs font-bold text-rose-900 mt-0.5" id="pastDueNoticeText">
+                Previous bus fee due must be cleared first.
+              </div>
+              <div class="text-[11px] text-rose-800 mt-0.5 leading-relaxed">
+                Under school transport rules, outstanding dues from earlier months must be cleared in chronological order before subsequent months can be processed.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Month Selector & Fee Status Card -->
+        <div class="border-2 border-emerald-300 rounded-2xl p-4 sm:p-5 bg-gradient-to-r from-emerald-50/80 via-teal-50/40 to-slate-50 space-y-3.5 shadow-xs">
+          <!-- Month Selection Dropdown Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-emerald-200/80 pb-3">
+            <div>
+              <label for="parentMonthSelect" class="text-xs font-black text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
+                <span>📅</span> <span>Select Billing Month:</span>
+              </label>
+              <p class="text-[11px] text-emerald-800 font-medium mt-0.5">Select any month to check status, pay, or download receipt</p>
+            </div>
+            
+            <div class="w-full sm:w-auto min-w-[220px]">
+              <select id="parentMonthSelect" onchange="handleParentMonthSelect(this.value)" class="w-full px-3.5 py-2.5 bg-white border-2 border-emerald-400 rounded-xl text-xs sm:text-sm font-black text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-400 shadow-xs cursor-pointer">
+                <!-- Populated dynamically by pay.js -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Dynamic Details for the Selected Month -->
+          <div class="flex items-center justify-between pt-1">
+            <div class="space-y-1">
+              <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider" id="billingPeriodLabel">Month Status</div>
+              <div id="cardBillingPeriodContainer">
+                <span id="selectedMonthStatusBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-emerald-100 text-emerald-900 border border-emerald-300 shadow-2xs">
+                  ✓ PAID & VERIFIED
+                </span>
+              </div>
+              <div class="text-[11px] text-slate-600 font-medium" id="cardDueStatusSubtext">
+                Verified payment on record
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fee Amount</div>
+              <div class="text-3xl sm:text-4xl font-black text-slate-900" id="cardAmount">₹0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Button (Contextual: Pay if unpaid, View/Download Receipt if paid) -->
+        <div class="space-y-2 no-print">
+          <!-- Discontinued Alert Card for Left Students with No Dues -->
+          <div id="serviceStoppedCard" class="hidden bg-slate-100 border-2 border-slate-300 rounded-2xl p-4 text-center space-y-2">
+            <div class="text-2xl">🛑</div>
+            <div class="text-xs font-black text-slate-900 uppercase tracking-wide">Transport Service Discontinued</div>
+            <div class="text-xs text-slate-600" id="serviceStoppedDesc">
+              This student has discontinued school bus transport. All previous dues are cleared, and upcoming fees have been permanently stopped.
+            </div>
+            <p class="text-[11px] text-emerald-800 font-bold">✓ No further payment is required.</p>
+          </div>
+
+          <button id="btnProceedToPay" onclick="handleMainActionClick()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-base rounded-2xl shadow-lg shadow-emerald-600/20 transition flex items-center justify-center gap-2 cursor-pointer">
+            <span>Proceed to Pay</span>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+
+          <div id="alreadyPaidNote" class="hidden text-center text-xs font-bold text-emerald-700 bg-emerald-50 py-2.5 rounded-xl border border-emerald-200">
+            ✓ This payment has already been completed & verified.
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==================================================================== -->
+    <!-- VIEW 3: USER'S EXACT SCANNER QR & UPI APPS                          -->
+    <!-- ==================================================================== -->
+    <section id="viewPaymentStep" class="p-5 sm:p-7 space-y-4 hidden">
+      <!-- Back button -->
+      <button onclick="goToReviewDetails()" class="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center gap-1 transition no-print">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to Student Summary
+      </button>
+
+      <!-- ==================================================== -->
+      <!-- STATE 1: UNPAID (Payment Pending -> Scan & Pay)       -->
+      <!-- ==================================================== -->
+      <div id="unpaidPaymentSection" class="space-y-4">
+        <!-- Responsive Grid for Laptop (Side-by-Side) & Mobile (Stacked) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- LEFT COLUMN: QR CODE + AMOUNT BADGE + BANK BADGE (5 cols on laptop) -->
+          <div class="lg:col-span-5 space-y-4">
+            <!-- Pay Header -->
+            <div class="text-center bg-slate-50/80 border border-slate-200/80 rounded-2xl p-4 space-y-1">
+              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200 text-xs font-black" id="payStepDueBadge">
+                ⚠️ Payment Due • <span id="lockedAmountBadge">₹2,310</span>
+              </div>
+              <div class="text-3xl sm:text-4xl font-black text-slate-900" id="payStepAmount">₹0</div>
+              <p class="text-xs text-slate-600">Student: <strong id="payStepChildName" class="text-slate-900">-</strong> • Bus: <span id="payStepBusNumber" class="font-black text-amber-800">S3</span></p>
+              <div class="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-100/90 border border-emerald-300 px-3 py-1 rounded-full mt-1" id="payStepMonthBadge">
+                <span>📅 Fee for Month:</span> <strong id="payStepMonthName" class="text-emerald-950 font-black">September 2026</strong>
+              </div>
+            </div>
+
+            <!-- PAYMENT METHOD MODE SWITCHER (UPI / SCANNER vs BANK ACCOUNT TRANSFER) -->
+            <div class="bg-slate-100 p-1 rounded-2xl flex items-center gap-1 text-xs font-bold max-w-[320px] mx-auto w-full">
+              <button type="button" id="tabModeUpi" onclick="switchPaymentMode('upi')" class="flex-1 py-2 px-2.5 rounded-xl bg-white text-emerald-950 font-black shadow-xs border border-emerald-300 transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <span>🛡️ Scanner / UPI</span>
+              </button>
+              <button type="button" id="tabModeBank" onclick="switchPaymentMode('bank')" class="flex-1 py-2 px-2.5 rounded-xl text-slate-600 hover:text-slate-900 font-bold transition flex items-center justify-center gap-1.5 cursor-pointer">
+                <span>🏦 Bank A/C</span>
+              </button>
+            </div>
+
+            <!-- OPTION 1: 100% RISK-FREE UPI & VERIFIED SCANNABLE QR CODE -->
+            <div id="paymentModeUpiContainer" class="space-y-3.5">
+              
+              <!-- 🛡️ PAYTM PROTECT / UPI RISK-FREE ADVISORY -->
+              <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-300 rounded-2xl p-3 text-left space-y-1 shadow-2xs max-w-[320px] mx-auto">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase tracking-wider text-emerald-950 flex items-center gap-1">
+                    <span>🛡️</span> 100% Zero-Risk Payment
+                  </span>
+                  <span class="text-[9px] font-black bg-emerald-200 text-emerald-900 px-1.5 py-0.2 rounded-full">
+                    ✓ Verified Account
+                  </span>
+                </div>
+                <p class="text-[10px] leading-tight text-emerald-900 font-medium">
+                  As recommended by Paytm Protect: Pay directly via <strong>Mobile Number (9814124392)</strong> or <strong>Scan Official QR</strong> below to avoid app risk warnings.
+                </p>
+              </div>
+
+              <!-- 📱 METHOD 1: PAY VIA MOBILE NUMBER (PAYTM RECOMMENDED) -->
+              <div class="bg-white p-3.5 rounded-2xl border-2 border-blue-400 shadow-xs text-left max-w-[320px] mx-auto space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-black text-blue-950 uppercase tracking-wide flex items-center gap-1">
+                    <span>📱</span> Option A: Pay via Mobile No.
+                  </span>
+                  <span class="text-[9px] font-black bg-blue-100 text-blue-900 px-1.5 py-0.2 rounded">Recommended by Paytm</span>
+                </div>
+                
+                <div class="bg-blue-50/70 p-2.5 rounded-xl border border-blue-200 space-y-1">
+                  <div class="text-[10px] text-slate-500 font-semibold flex items-center justify-between">
+                    <span>Payee Name: <strong class="text-slate-800">Himanshu Walia</strong></span>
+                    <span class="text-emerald-700 font-black text-[10px]">✓ Linked on Paytm</span>
+                  </div>
+                  <div class="flex items-center justify-between gap-2 mt-1">
+                    <span id="mobileNumberDisplay" class="text-base font-mono font-black text-blue-950 tracking-wider select-all">9814124392</span>
+                    <button type="button" id="btnCopyMobile" onclick="copyMobileNumber()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-black text-xs rounded-lg transition shadow-xs cursor-pointer flex items-center gap-1">
+                      <span>📋 Copy Mobile</span>
+                    </button>
+                  </div>
+                </div>
+
+                <p class="text-[10px] text-slate-500 leading-tight">
+                  Open Paytm, PhonePe or GPay, choose <strong>"To Mobile Number"</strong>, paste <strong>9814124392</strong> and enter fee. Shows verified name <em>Himanshu Walia</em> with 0 risk.
+                </p>
+              </div>
+
+              <!-- 📷 METHOD 2: SCAN OFFICIAL BANK QR CODE -->
+              <div class="bg-white p-4 sm:p-5 rounded-3xl border-2 border-emerald-500 shadow-md text-center max-w-[320px] mx-auto space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
+                  <span class="text-xs font-black text-slate-800 flex items-center gap-1">
+                    <span>📷</span> Option B: Scan Official QR
+                  </span>
+                  <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    Zero Risk QR
+                  </span>
+                </div>
+
+                <!-- QR Code with verified container -->
+                <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-inner">
+                  <img id="qrImageElement" src="/scanner.png" alt="Official Bank Payment QR Code" class="w-56 h-56 mx-auto object-contain">
+                </div>
+
+                <!-- Official Bank Payee Verification -->
+                <div class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 text-left">
+                  <div class="text-xs font-black text-slate-900 flex items-center justify-between">
+                    <span>Payee: HIMANSHU  WALIA</span>
+                    <span class="w-4 h-4 rounded-full bg-emerald-500 text-white text-[10px] flex items-center justify-center font-black" title="Verified by YES Bank">✓</span>
+                  </div>
+                  <div class="text-xs font-mono font-bold text-slate-700">
+                    himanshu1461@ptyes
+                  </div>
+                  <div class="text-[10px] text-emerald-800 font-bold" id="qrAmountHint">
+                    ✓ Official Bank Scanner. Zero risk flags when scanned.
+                  </div>
+                </div>
+
+                <!-- 1-Tap Copy Shortcuts -->
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                  <button type="button" id="btnCopyAmount" onclick="copyAmount()" class="py-2 px-2 text-[11px] font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-xl transition flex items-center justify-center gap-1 active:scale-95 shadow-2xs cursor-pointer">
+                    <span>📋 Copy Fee (<span id="btnCopyFeeAmount">₹2,310</span>)</span>
+                  </button>
+                  <button type="button" id="btnCopyUpi" onclick="copyUpiVpa()" class="py-2 px-2 text-[11px] font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded-xl transition flex items-center justify-center gap-1 active:scale-95 shadow-2xs cursor-pointer">
+                    <span>📋 Copy UPI ID</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Mobile App Direct Launch Buttons (Clean Verified Schemes) -->
+              <div class="space-y-2 no-print max-w-[320px] mx-auto w-full">
+                <div class="text-[11px] font-bold text-slate-500 text-center uppercase tracking-wider lg:hidden">
+                  Or Tap to Open Verified UPI App
+                </div>
+                
+                <!-- 1-Tap Specific App Triggers (Mobile Only) -->
+                <div class="grid grid-cols-3 gap-2 text-xs lg:hidden">
+                  <a id="linkGPay" href="gpay://upi/pay?pa=himanshu1461@ptyes&pn=HIMANSHU%20%20WALIA" class="py-2.5 px-2 bg-white border-2 border-slate-200 hover:border-emerald-500 rounded-xl font-bold text-slate-800 flex flex-col items-center justify-center gap-1 text-center shadow-xs">
+                    <span class="text-base">🟢</span>
+                    <span class="text-[11px]">GPay</span>
+                  </a>
+                  <a id="linkPhonePe" href="phonepe://pay?pa=himanshu1461@ptyes&pn=HIMANSHU%20%20WALIA" class="py-2.5 px-2 bg-white border-2 border-slate-200 hover:border-purple-500 rounded-xl font-bold text-slate-800 flex flex-col items-center justify-center gap-1 text-center shadow-xs">
+                    <span class="text-base">🟣</span>
+                    <span class="text-[11px]">PhonePe</span>
+                  </a>
+                  <a id="linkPaytm" href="paytmmp://pay?pa=himanshu1461@ptyes&pn=HIMANSHU%20%20WALIA" class="py-2.5 px-2 bg-white border-2 border-slate-200 hover:border-blue-500 rounded-xl font-bold text-slate-800 flex flex-col items-center justify-center gap-1 text-center shadow-xs">
+                    <span class="text-base">🔵</span>
+                    <span class="text-[11px]">Paytm</span>
+                  </a>
+                </div>
+
+                <!-- Universal Fallback UPI Link -->
+                <a id="mobileUpiLink" href="upi://pay?pa=himanshu1461@ptyes&pn=HIMANSHU%20%20WALIA" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-black text-xs rounded-2xl shadow-md shadow-emerald-600/20 transition flex items-center justify-center gap-2 text-center lg:hidden">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                  <span id="mobilePayBtnText">Open Any UPI App</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- OPTION 2: BANK ACCOUNT TRANSFER DETAILS CARD -->
+            <div id="paymentModeBankContainer" class="space-y-3 hidden max-w-[320px] mx-auto w-full">
+              <div class="bg-gradient-to-br from-indigo-950 via-blue-900 to-slate-900 text-white p-5 rounded-3xl shadow-lg space-y-3.5 relative overflow-hidden border border-indigo-700">
+                <div class="absolute -right-3 -bottom-3 text-7xl opacity-10 select-none pointer-events-none">🏦</div>
+                
+                <div class="flex items-center justify-between border-b border-white/20 pb-2">
+                  <div class="text-[10px] font-black uppercase tracking-wider text-indigo-200">Official Transport Account</div>
+                  <span class="text-[10px] font-black bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 px-2 py-0.5 rounded-full">✓ Verified Payee</span>
+                </div>
+
+                <!-- Account Holder Name -->
+                <div>
+                  <div class="text-[10px] text-indigo-200 uppercase font-bold tracking-wider">Beneficiary Name</div>
+                  <div class="flex items-center justify-between mt-0.5">
+                    <div class="text-sm font-black tracking-wide" id="bankBeneficiaryDisplay">HIMANSHU WALIA</div>
+                    <button type="button" onclick="copyText(document.getElementById('bankBeneficiaryDisplay').textContent, 'Beneficiary Name copied!')" class="text-[10px] px-2 py-0.5 bg-white/20 hover:bg-white/30 rounded-md font-bold transition cursor-pointer">Copy</button>
+                  </div>
+                </div>
+
+                <!-- Bank Name & Account Type -->
+                <div class="grid grid-cols-2 gap-2 pt-1 border-t border-white/10 text-xs">
+                  <div>
+                    <div class="text-[10px] text-indigo-200 uppercase font-bold">Bank Name</div>
+                    <div class="font-bold text-white" id="bankNameDisplay">YES Bank</div>
+                  </div>
+                  <div>
+                    <div class="text-[10px] text-indigo-200 uppercase font-bold">Account Type</div>
+                    <div class="font-semibold text-indigo-100" id="bankTypeDisplay">Current Account</div>
+                  </div>
+                </div>
+
+                <!-- Account Number with Copy -->
+                <div class="bg-black/30 p-2.5 rounded-xl border border-white/15">
+                  <div class="text-[10px] text-indigo-200 uppercase font-bold">Account Number</div>
+                  <div class="flex items-center justify-between mt-0.5">
+                    <div class="font-mono text-base font-black tracking-wider text-amber-300 select-all" id="bankAccNoDisplay">14610100012345</div>
+                    <button type="button" id="btnCopyBankAcc" onclick="copyText(document.getElementById('bankAccNoDisplay').textContent, 'Account Number copied!')" class="text-[11px] px-2.5 py-1 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-lg transition cursor-pointer shadow-xs active:scale-95">Copy A/C</button>
+                  </div>
+                </div>
+
+                <!-- IFSC Code with Copy -->
+                <div class="bg-black/30 p-2.5 rounded-xl border border-white/15">
+                  <div class="text-[10px] text-indigo-200 uppercase font-bold">IFSC Code</div>
+                  <div class="flex items-center justify-between mt-0.5">
+                    <div class="font-mono text-sm font-black tracking-widest text-emerald-300 select-all" id="bankIfscDisplay">YESB0000146</div>
+                    <button type="button" id="btnCopyBankIfsc" onclick="copyText(document.getElementById('bankIfscDisplay').textContent, 'IFSC Code copied!')" class="text-[11px] px-2.5 py-1 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black rounded-lg transition cursor-pointer shadow-xs active:scale-95">Copy IFSC</button>
+                  </div>
+                </div>
+
+                <!-- Exact Amount to Transfer -->
+                <div class="pt-1 border-t border-white/10 flex items-center justify-between text-xs">
+                  <div>
+                    <span class="text-[10px] text-indigo-200 uppercase font-bold block">Amount to Transfer</span>
+                    <strong class="text-base text-white font-black" id="bankTransferAmountDisplay">₹2,310</strong>
+                  </div>
+                  <button type="button" onclick="copyAmount()" class="text-[11px] px-2.5 py-1 bg-white/20 hover:bg-white/30 text-white font-bold rounded-lg transition cursor-pointer">Copy Amount</button>
+                </div>
+
+                <!-- Branch -->
+                <div class="text-[10px] text-indigo-300 pt-0.5" id="bankBranchDisplay">
+                  Branch: Civil Lines / City Branch
+                </div>
+              </div>
+
+              <!-- NEFT / IMPS Instructions -->
+              <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-3.5 text-[11px] text-indigo-950 space-y-1.5 text-left shadow-xs">
+                <div class="font-bold flex items-center gap-1.5 text-indigo-900">
+                  <span>💡</span> <span>How to Pay via Bank App:</span>
+                </div>
+                <ol class="list-decimal pl-4 space-y-1 text-[10px] text-indigo-900 leading-tight">
+                  <li>Open your bank app (SBI, HDFC, ICICI, PNB, etc.).</li>
+                  <li>Choose <strong>Bank Transfer / NEFT / IMPS</strong>.</li>
+                  <li>Paste the <strong>Account Number</strong> & <strong>IFSC</strong> above.</li>
+                  <li>Send fee, then select <strong>Bank Transfer</strong> on the right and click <strong>"I Have Paid"</strong>!</li>
+                </ol>
+              </div>
+            </div>
+
+            <!-- Verified Payment Safety Guarantee Card -->
+            <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-300 rounded-2xl p-4 space-y-2 no-print shadow-xs max-w-[320px] mx-auto text-left">
+              <div class="flex items-center gap-2">
+                <span class="text-xl leading-none">🛡️</span>
+                <div>
+                  <div class="text-xs font-black text-emerald-950">100% Safe Official Account</div>
+                  <div class="text-[10px] text-emerald-800 font-semibold">RAM RAM JI TRANSPORT</div>
+                </div>
+              </div>
+              <div class="text-[11px] text-emerald-900 leading-snug space-y-1.5 bg-white/80 p-2.5 rounded-xl border border-emerald-200">
+                <p><strong>• If App Asks "Paying new contact?":</strong> Tap <strong>"Proceed" / "Continue"</strong>. This is standard UPI security for first-time transfers to the school bus account.</p>
+                <p><strong>• Verified Recipient:</strong> Shows <strong>HIMANSHU  WALIA (YES Bank)</strong>.</p>
+                <p><strong>• Instant Receipt:</strong> After paying, tap <em>"I Have Completed Payment"</em> to get your stamped receipt immediately.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: 1-TAP CONFIRMATION FORM & ACTIONS (7 cols on laptop) -->
+          <div class="lg:col-span-7 space-y-4">
+            <!-- Parent-Friendly Payment Confirmation (Simple 1-Tap) -->
+            <div class="bg-white border-2 border-emerald-400/80 rounded-3xl p-5 sm:p-6 space-y-4 no-print shadow-sm">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                  <div class="text-sm font-black text-slate-900 flex items-center gap-1.5">
+                    <span>✅</span> Done Paying? Confirm in 1 Step
+                  </div>
+                  <p class="text-xs text-slate-500 mt-0.5">Himanshu Walia will instantly verify your bank credit</p>
+                </div>
+                <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-full shrink-0">Fast & Easy</span>
+              </div>
+
+              <form onsubmit="handleParentConfirm(event)" class="space-y-4">
+                <!-- 1-Tap App Selector Chips -->
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-2">1. Which App Did You Use to Pay? *</label>
+                  <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs" id="appSelectorChips">
+                    <button type="button" onclick="selectPayingApp('Google Pay')" class="app-chip active-chip py-2.5 px-2 rounded-xl border-2 font-bold flex items-center justify-center gap-1.5 transition text-center cursor-pointer" data-app="Google Pay">
+                      <span>🟢</span> GPay
+                    </button>
+                    <button type="button" onclick="selectPayingApp('PhonePe')" class="app-chip py-2.5 px-2 rounded-xl border-2 font-bold flex items-center justify-center gap-1.5 transition text-center cursor-pointer" data-app="PhonePe">
+                      <span>🟣</span> PhonePe
+                    </button>
+                    <button type="button" onclick="selectPayingApp('Paytm')" class="app-chip py-2.5 px-2 rounded-xl border-2 font-bold flex items-center justify-center gap-1.5 transition text-center cursor-pointer" data-app="Paytm">
+                      <span>🔵</span> Paytm
+                    </button>
+                    <button type="button" onclick="selectPayingApp('Bank Transfer / NEFT')" class="app-chip py-2.5 px-2 rounded-xl border-2 font-bold flex items-center justify-center gap-1.5 transition text-center cursor-pointer" data-app="Bank Transfer / NEFT">
+                      <span>🏦</span> Bank Transfer
+                    </button>
+                    <button type="button" onclick="selectPayingApp('Other / Cash')" class="app-chip py-2.5 px-2 rounded-xl border-2 font-bold flex items-center justify-center gap-1.5 transition text-center cursor-pointer col-span-2 sm:col-span-2" data-app="Other / Cash">
+                      <span>⚪</span> Other App / Cash
+                    </button>
+                  </div>
+                  <input type="hidden" id="selectedPayingApp" value="Google Pay">
+                </div>
+
+                <!-- Paying Mobile Number / Parent Name -->
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1.5">2. Paying Mobile No. or Parent Name *</label>
+                  <input type="text" id="parentPayerInfoInput" required placeholder="e.g. 98141 24392 or Sunita Verma" class="w-full px-4 py-3 border-2 border-slate-200 rounded-xl text-sm font-semibold focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 focus:outline-none placeholder:text-slate-400">
+                  <p class="text-[11px] text-slate-500 mt-1">This helps Himanshu Walia instantly match your payment with the bank SMS.</p>
+                </div>
+
+                <!-- Optional Collapsible UTR for Tech-Savvy Parents -->
+                <div class="bg-slate-50/70 p-3 rounded-xl border border-slate-200">
+                  <button type="button" onclick="toggleOptionalUtr()" class="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1.5 transition">
+                    <span id="utrToggleIcon" class="font-mono text-sm">＋</span> <span>Have Bank Reference / UTR? (Optional)</span>
+                  </button>
+                  <div id="optionalUtrContainer" class="hidden mt-2">
+                    <input type="text" id="parentUtrInput" placeholder="Optional: 12-digit UTR from UPI app receipt" class="w-full px-3.5 py-2.5 border border-slate-200 bg-white rounded-lg text-xs font-mono focus:border-emerald-500 focus:ring-1 focus:ring-emerald-300 focus:outline-none">
+                  </div>
+                </div>
+
+                <!-- Big Confirmation Button -->
+                <button type="submit" id="btnParentConfirm" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-2xl transition shadow-lg shadow-emerald-600/25 active:scale-[0.98] flex items-center justify-center gap-2">
+                  <span>✓ I Have Paid For <span id="confirmBtnMonth" class="underline decoration-emerald-300">September 2026</span></span> <span id="confirmBtnAmount">₹2,310</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- Helpful Verification Info Box -->
+            <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-4 text-xs text-blue-900 space-y-1.5 no-print">
+              <div class="font-bold flex items-center gap-1.5">
+                <span>ℹ️</span> How Does Instant Verification Work?
+              </div>
+              <p class="text-slate-600 text-[11px] leading-relaxed">
+                When you click confirm, the operator is notified instantly. Once confirmed against the bank record, your official stamped school fee receipt is unlocked for download and printing.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ==================================================== -->
+      <!-- STATE 2: AWAITING VERIFICATION (Submitted)            -->
+      <!-- ==================================================== -->
+      <div id="submittedPaymentSection" class="hidden space-y-4 text-center max-w-xl mx-auto">
+        <div class="bg-blue-50/80 border-2 border-blue-200 rounded-3xl p-6 sm:p-8 space-y-4">
+          <div class="w-16 h-16 bg-blue-100 text-blue-700 rounded-2xl flex items-center justify-center mx-auto text-3xl animate-bounce">
+            ⏳
+          </div>
+          <div class="space-y-1.5">
+            <div class="inline-block px-3 py-0.5 rounded-full text-xs font-black bg-blue-100 text-blue-800 uppercase">Verification Pending</div>
+            <h3 class="text-xl font-black text-slate-900" id="submittedHeaderTitle">Payment Reference Submitted</h3>
+            <div class="inline-flex items-center gap-1 text-xs font-bold text-blue-900 bg-blue-100/90 border border-blue-300 px-3 py-1 rounded-full">
+              <span>📅 Fee for Month:</span> <strong id="submittedMonthName">September 2026</strong>
+            </div>
+            <p class="text-xs sm:text-sm text-slate-700 pt-1" id="submittedPayerDisplay">Payer: <strong class="text-slate-900 font-bold" id="submittedPayerName">-</strong></p>
+            <p class="text-xs text-slate-500">Status Ref: <span class="font-mono text-blue-800 font-bold" id="submittedUtrDisplay">-</span></p>
+          </div>
+          <p class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+            The transport coordinator (Himanshu Walia) is verifying the bank credit. Once approved, your <strong>Official Fee Receipt</strong> will be unlocked right here.
+          </p>
+          <div class="pt-2">
+            <button id="btnRefreshStatus" onclick="refreshPaymentStatus()" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow transition inline-flex items-center gap-2 active:scale-95">
+              <span>🔄</span> Refresh Status
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================================================== -->
+      <!-- STATE 3: CONFIRMED & VERIFIED (Actually Paid)         -->
+      <!-- ==================================================== -->
+      <div id="confirmedPaymentSection" class="hidden space-y-4 max-w-xl mx-auto">
+        <div class="bg-emerald-50/90 border-2 border-emerald-300 rounded-3xl p-6 sm:p-8 text-center space-y-4 shadow-sm">
+          <div class="w-16 h-16 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto text-3xl font-black shadow-inner">
+            ✓
+          </div>
+          <div class="space-y-1">
+            <div class="inline-block px-3 py-0.5 rounded-full text-xs font-black bg-emerald-200/80 text-emerald-900 uppercase">Officially Verified</div>
+            <h3 class="text-xl sm:text-2xl font-black text-emerald-950">Payment Confirmed & Verified</h3>
+            <p class="text-xs text-emerald-800 font-semibold" id="verifiedDateText">Verified by Transport Management</p>
+          </div>
+
+          <!-- Stamped Receipt Card -->
+          <div class="bg-white p-5 rounded-2xl border border-emerald-200 text-xs text-left space-y-3 shadow-xs">
+            <div class="flex justify-between items-center pb-2.5 border-b border-slate-100">
+              <span class="text-slate-400 font-bold uppercase text-[10px] tracking-wider">Official School Bus Receipt</span>
+              <span class="font-mono font-bold text-emerald-700" id="rcptToken">STU-000</span>
+            </div>
+            <div class="flex justify-between"><span class="text-slate-500" id="rcptStudentLabel">Student Name:</span><strong id="rcptStudentName" class="text-slate-900 text-right">-</strong></div>
+            <div id="rcptSiblingBreakdownContainer" class="hidden text-[11px] bg-slate-50 p-2.5 rounded-lg border border-slate-100 space-y-1"></div>
+            <div class="flex justify-between"><span class="text-slate-500">School:</span><strong id="rcptSchoolName" class="text-slate-900">RAM RAM JI TRANSPORT</strong></div>
+            <div class="flex justify-between"><span class="text-slate-500">Bus Assigned:</span><strong id="rcptBusNumber" class="text-amber-800 font-black">S3</strong></div>
+            <div class="flex justify-between items-center py-1 border-t border-b border-emerald-100 bg-emerald-50/50 px-2 rounded-lg">
+              <span class="text-emerald-900 font-bold">Fee Paid For Month:</span>
+              <strong id="rcptFeeMonth" class="text-emerald-800 font-black text-xs sm:text-sm">September 2026</strong>
+            </div>
+            <div class="flex justify-between"><span class="text-slate-500">Amount Paid:</span><strong id="rcptAmount" class="text-lg text-emerald-700 font-black">₹0</strong></div>
+            <div class="flex justify-between"><span class="text-slate-500">Payer:</span><strong id="rcptPayer" class="text-slate-800">-</strong></div>
+            <div class="flex justify-between"><span class="text-slate-500">Bank / Txn Ref:</span><strong id="rcptRef" class="font-mono text-slate-700">-</strong></div>
+          </div>
+
+          <!-- Button to View & Download Earlier Months Receipts -->
+          <div id="confirmedPreviousReceiptsBtnContainer" class="pt-2 no-print">
+            <button type="button" onclick="goToReviewDetails()" class="w-full py-3 bg-amber-50 hover:bg-amber-100 text-amber-900 border-2 border-amber-300 font-bold text-xs rounded-2xl transition flex items-center justify-center gap-2 cursor-pointer shadow-xs">
+              <span>📜</span>
+              <span>Download Previous Month Receipts (April – August)</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="max-w-md md:max-w-3xl lg:max-w-5xl mx-auto w-full text-center text-xs text-slate-400 mt-4 no-print space-y-1">
+    <div>🔒 Secure School Bus Fee Portal • Operator-Verified Records</div>
+    <div id="portalSupportPhone">Support: Himanshu Walia</div>
+  </footer>
+
+  <!-- ==================================================================== -->
+  <!-- MODAL: OFFICIAL STAMPED RECEIPT VIEWER & DOWNLOAD                    -->
+  <!-- ==================================================================== -->
+  <div id="receiptViewModal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden my-auto animate-in fade-in zoom-in duration-150">
+      
+      <!-- Modal Top Bar -->
+      <div class="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between no-print">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">📄</span>
+          <div>
+            <div class="text-xs font-black tracking-wide">Official Fee Receipt</div>
+            <div class="text-[10px] text-slate-400">RAM RAM JI TRANSPORT</div>
+          </div>
+        </div>
+        <button type="button" onclick="closeReceiptModal()" class="text-slate-400 hover:text-white p-1 rounded-lg transition cursor-pointer text-lg font-bold">
+          ✕
+        </button>
+      </div>
+
+      <!-- Printable Receipt Body -->
+      <div class="p-5 sm:p-6 space-y-4 text-left" id="printableReceiptCard">
+        <!-- Receipt Top Header -->
+        <div class="border-b-2 border-emerald-500 pb-3 flex items-start justify-between">
+          <div>
+            <div class="flex items-center gap-1.5">
+              <span class="text-2xl">🚌</span>
+              <div class="font-black text-lg sm:text-xl text-slate-900" id="mRcptBusinessName">RAM RAM JI TRANSPORT</div>
+            </div>
+            <div class="text-xs font-bold text-emerald-800 mt-0.5" id="mRcptProprietor">Proprietor: LALIT KUMAR WALIA</div>
+            <p class="text-[11px] font-medium text-slate-600">School Bus Fleet & Monthly Transport Services</p>
+            <p class="text-[10px] text-slate-400" id="mRcptContactPhone">Support: Himanshu Walia (+91 98141 24392)</p>
+          </div>
+          <div class="text-right">
+            <span class="inline-block px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-900 text-[10px] font-black tracking-wider uppercase border border-emerald-300">
+              Verified Receipt
+            </span>
+            <div class="font-mono text-[10px] text-slate-500 mt-1" id="mRcptVoucherNo">CLEARED-AUG-2026</div>
+            <div class="text-[10px] text-slate-400 mt-0.5" id="mRcptDate">Date: 31 Aug 2026</div>
+          </div>
+        </div>
+
+        <!-- Student & Route Details -->
+        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 space-y-2 text-xs">
+          <div class="flex justify-between items-center pb-2 border-b border-slate-200">
+            <span class="text-slate-500 font-semibold">Student Name:</span>
+            <span class="text-slate-900 font-black text-sm" id="mRcptStudentName">-</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 font-semibold">Enrolled School:</span>
+            <span class="text-slate-800 font-bold" id="mRcptSchoolName">Police DAV Public School</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 font-semibold">Assigned Bus:</span>
+            <span class="text-amber-900 font-black bg-amber-100 px-2 py-0.5 rounded-md border border-amber-300" id="mRcptBusNumber">Bus S3</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 font-semibold">Designated Stop:</span>
+            <span class="text-slate-800 font-medium" id="mRcptRouteStop">-</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 font-semibold">Class / Roll No:</span>
+            <span class="text-slate-800 font-medium" id="mRcptClassRoll">-</span>
+          </div>
+        </div>
+
+        <!-- Payment Particulars -->
+        <div class="border-2 border-dashed border-emerald-300 bg-emerald-50/50 rounded-2xl p-4 space-y-2.5">
+          <div class="flex justify-between items-center">
+            <div>
+              <div class="text-[10px] uppercase tracking-wider font-bold text-emerald-800">Transport Fee Month</div>
+              <div class="text-base sm:text-lg font-black text-emerald-950 flex items-center gap-1.5" id="mRcptMonth">
+                <span>📅</span> <span>August 2026</span>
+              </div>
+            </div>
+            <div class="text-right">
+              <div class="text-[10px] uppercase tracking-wider font-bold text-slate-500">Amount Paid</div>
+              <div class="text-2xl sm:text-3xl font-black text-emerald-700" id="mRcptAmount">₹2,310</div>
+            </div>
+          </div>
+          <div class="text-[11px] text-emerald-900 font-semibold border-t border-emerald-200/80 pt-1.5" id="mRcptAmountWords">
+            Amount in words: Two Thousand Three Hundred Ten Rupees Only
+          </div>
+        </div>
+
+        <!-- Transaction Details -->
+        <div class="space-y-1 text-[11px] text-slate-600 bg-white p-3 rounded-xl border border-slate-200">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Payment Method:</span>
+            <span class="font-bold text-slate-800" id="mRcptMethod">Google Pay</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Transaction Ref / Voucher:</span>
+            <span class="font-mono text-slate-800 font-bold" id="mRcptRef">CLEARED-AUG-2026</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Payer Details:</span>
+            <span class="font-medium text-slate-700" id="mRcptPayerInfo">Pre-cleared Transport Ledger</span>
+          </div>
+        </div>
+
+        <!-- Stamped Seal & Signature Box -->
+        <div class="pt-2 flex items-center justify-between border-t border-slate-200">
+          <div class="inline-flex items-center gap-2 border-2 border-emerald-600 rounded-xl px-3 py-1.5 bg-emerald-50/70 text-emerald-950 shadow-2xs rotate-[-1deg]">
+            <span class="text-2xl">🛡️</span>
+            <div class="text-left">
+              <div class="text-[9px] font-black uppercase tracking-wider text-emerald-900">Official Stamp</div>
+              <div class="text-[10px] font-extrabold text-emerald-800" id="mRcptStampBiz">RAM RAM JI TRANSPORT</div>
+              <div class="text-[9px] font-bold text-emerald-900" id="mRcptStampProp">Prop. LALIT KUMAR WALIA</div>
+              <div class="text-[8.5px] text-emerald-700 font-bold">✓ Verified & Cleared</div>
+            </div>
+          </div>
+          <div class="text-right text-[10px] space-y-0.5">
+            <div class="font-black text-slate-900" id="mRcptSignProp">LALIT KUMAR WALIA</div>
+            <div class="text-[9px] font-bold text-emerald-800 uppercase">Proprietor</div>
+            <div class="font-bold text-slate-700 pt-0.5" id="mRcptSignOwner">Himanshu Walia</div>
+            <div class="text-slate-500 text-[9px]">Fleet Incharge / Auth. Signatory</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons (Bottom Bar) -->
+      <div class="p-4 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center gap-2.5">
+        <button type="button" id="btnDownloadModalPdf" onclick="downloadCurrentReceiptPdf()" class="flex-1 min-w-[200px] py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-600/25 transition flex items-center justify-center gap-2 cursor-pointer">
+          <svg class="w-4 h-4 text-emerald-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <span>Download PDF Receipt</span>
+        </button>
+        <button type="button" onclick="closeReceiptModal()" class="px-5 py-3.5 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs sm:text-sm rounded-2xl border border-slate-200 transition cursor-pointer">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Dedicated Isolated Print Container (100% Reliable Print Target) -->
+  <div id="printContainer" class="hidden"></div>
+
+  <script src="/pay.js"></script>
+</body>
+</html>
