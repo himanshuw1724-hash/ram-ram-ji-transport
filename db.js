@@ -1135,10 +1135,12 @@ function submitParentPayment(token, paymentData = {}) {
   primaryStudent.isClubbedPayment = isClubbed;
   primaryStudent.updatedAt = now;
 
+  const studentFixedFee = Number(primaryStudent.fixedFee !== undefined ? primaryStudent.fixedFee : primaryStudent.amount) || 2310;
+
   if (!primaryStudent.monthlyHistory) primaryStudent.monthlyHistory = {};
   primaryStudent.monthlyHistory[targetMonth] = {
     status: 'submitted',
-    amount: Number(primaryStudent.amount) || 2310,
+    amount: studentFixedFee,
     method: appName,
     voucher: primaryStudent.paymentRef,
     payerInfo: payerInfo,
@@ -1154,6 +1156,7 @@ function submitParentPayment(token, paymentData = {}) {
     siblings.forEach(sib => {
       const sibDue = getStudentDueDetails(sib, db.settings);
       const sibTargetMonth = (sibDue && sibDue.targetMonth) || targetMonth;
+      const sibFixedFee = Number(sib.fixedFee !== undefined ? sib.fixedFee : sib.amount) || 2310;
       sib.status = 'submitted';
       sib.billingPeriod = sibTargetMonth;
       sib.submittedAt = now;
@@ -1166,7 +1169,7 @@ function submitParentPayment(token, paymentData = {}) {
       if (!sib.monthlyHistory) sib.monthlyHistory = {};
       sib.monthlyHistory[sibTargetMonth] = {
         status: 'submitted',
-        amount: Number(sib.amount) || 2310,
+        amount: sibFixedFee,
         method: appName,
         voucher: primaryStudent.paymentRef,
         payerInfo: payerInfo,

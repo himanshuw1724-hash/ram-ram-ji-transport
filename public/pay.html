@@ -297,8 +297,11 @@
               </div>
             </div>
             <div class="text-right">
-              <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fee Amount</div>
+              <div class="inline-flex items-center gap-1 text-[10px] font-black text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full uppercase tracking-wider mb-0.5">
+                <span>🔒</span> <span>Fixed Monthly Fee</span>
+              </div>
               <div class="text-3xl sm:text-4xl font-black text-slate-900" id="cardAmount">₹0</div>
+              <div class="text-[10px] text-slate-500 font-semibold">Strictly Fixed & Locked</div>
             </div>
           </div>
         </div>
@@ -347,14 +350,28 @@
           <!-- LEFT COLUMN: QR CODE + AMOUNT BADGE + BANK BADGE (5 cols on laptop) -->
           <div class="lg:col-span-5 space-y-4">
             <!-- Pay Header -->
-            <div class="text-center bg-slate-50/80 border border-slate-200/80 rounded-2xl p-4 space-y-1">
-              <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200 text-xs font-black" id="payStepDueBadge">
-                ⚠️ Payment Due • <span id="lockedAmountBadge">₹2,310</span>
+            <div class="text-center bg-slate-50/80 border border-slate-200/80 rounded-2xl p-4 space-y-1.5">
+              <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-800 border border-rose-200 text-xs font-black" id="payStepDueBadge">
+                  ⚠️ Payment Due • <span id="lockedAmountBadge">₹2,310</span>
+                </div>
+                <div class="inline-flex items-center gap-1 text-[10px] font-black text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  <span>🔒</span> <span>Fixed Monthly Fee</span>
+                </div>
               </div>
               <div class="text-3xl sm:text-4xl font-black text-slate-900" id="payStepAmount">₹0</div>
               <p class="text-xs text-slate-600">Student: <strong id="payStepChildName" class="text-slate-900">-</strong> • Bus: <span id="payStepBusNumber" class="font-black text-amber-800">S3</span></p>
-              <div class="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-100/90 border border-emerald-300 px-3 py-1 rounded-full mt-1" id="payStepMonthBadge">
+              <div class="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 bg-emerald-100/90 border border-emerald-300 px-3 py-1 rounded-full" id="payStepMonthBadge">
                 <span>📅 Fee for Month:</span> <strong id="payStepMonthName" class="text-emerald-950 font-black">September 2026</strong>
+              </div>
+
+              <!-- Fixed Fee Policy Notice Banner -->
+              <div class="mt-2 text-left bg-emerald-50/90 border border-emerald-300/80 rounded-xl p-2.5 flex items-start gap-2 shadow-2xs">
+                <span class="text-base text-emerald-700 leading-none mt-0.5">🔒</span>
+                <div>
+                  <div class="text-[11px] font-black text-emerald-950 leading-tight">Fixed Fee System (Strictly Enforced)</div>
+                  <div class="text-[10px] text-emerald-800 leading-tight mt-0.5">The transport fee is fixed at exactly <strong class="text-emerald-950" id="fixedNoticeAmountDisplay">₹2,310</strong> per student. Please pay the exact fixed amount to ensure immediate automated verification.</div>
+                </div>
               </div>
             </div>
 
@@ -634,9 +651,23 @@
                   </div>
                 </div>
 
+                <!-- Locked Fixed Amount Verification Row -->
+                <div class="bg-emerald-50/80 border border-emerald-200 rounded-xl p-3 flex items-center justify-between shadow-2xs">
+                  <div class="flex items-center gap-2">
+                    <span class="text-base text-emerald-700">🔒</span>
+                    <div>
+                      <div class="text-xs font-black text-emerald-950">Fixed Monthly Transport Fee</div>
+                      <div class="text-[10px] text-emerald-800">Strictly locked • Non-negotiable rate</div>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-xs font-mono font-black text-emerald-950 bg-white border border-emerald-300 px-2.5 py-1 rounded-lg shadow-2xs" id="formLockedAmountDisplay">₹2,310</span>
+                  </div>
+                </div>
+
                 <!-- Big Confirmation Button -->
-                <button type="submit" id="btnParentConfirm" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-2xl transition shadow-lg shadow-emerald-600/25 active:scale-[0.98] flex items-center justify-center gap-2">
-                  <span>✓ I Have Paid For <span id="confirmBtnMonth" class="underline decoration-emerald-300">September 2026</span></span> <span id="confirmBtnAmount">₹2,310</span>
+                <button type="submit" id="btnParentConfirm" class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm rounded-2xl transition shadow-lg shadow-emerald-600/25 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer">
+                  <span>✓ I Have Paid Fixed Fee (<span id="confirmBtnAmount">₹2,310</span>)</span>
                 </button>
               </form>
             </div>
@@ -711,7 +742,7 @@
               <span class="text-emerald-900 font-bold">Fee Paid For Month:</span>
               <strong id="rcptFeeMonth" class="text-emerald-800 font-black text-xs sm:text-sm">September 2026</strong>
             </div>
-            <div class="flex justify-between"><span class="text-slate-500">Amount Paid:</span><strong id="rcptAmount" class="text-lg text-emerald-700 font-black">₹0</strong></div>
+            <div class="flex justify-between items-center"><span class="text-slate-500">Amount Paid:</span><div class="text-right"><span class="text-[9px] font-black text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.5 rounded mr-1">🔒 FIXED FEE</span><strong id="rcptAmount" class="text-lg text-emerald-700 font-black">₹0</strong></div></div>
             <div class="flex justify-between"><span class="text-slate-500">Payer:</span><strong id="rcptPayer" class="text-slate-800">-</strong></div>
             <div class="flex justify-between"><span class="text-slate-500">Bank / Txn Ref:</span><strong id="rcptRef" class="font-mono text-slate-700">-</strong></div>
           </div>
@@ -810,7 +841,9 @@
               </div>
             </div>
             <div class="text-right">
-              <div class="text-[10px] uppercase tracking-wider font-bold text-slate-500">Amount Paid</div>
+              <div class="inline-flex items-center gap-1 text-[9px] uppercase tracking-wider font-black text-emerald-800 bg-emerald-100 border border-emerald-300 px-1.5 py-0.2 rounded mb-0.5">
+                <span>🔒</span> <span>Fixed Fee Cleared</span>
+              </div>
               <div class="text-2xl sm:text-3xl font-black text-emerald-700" id="mRcptAmount">₹2,310</div>
             </div>
           </div>

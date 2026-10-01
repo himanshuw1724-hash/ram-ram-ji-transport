@@ -627,7 +627,7 @@ function generateReceiptPdf(data, outStream) {
   doc.fillColor('#064e3b').font('Helvetica-Bold').fontSize(16).text(data.month, 55, y + 28);
 
   // Amount
-  doc.fillColor('#065f46').font('Helvetica-Bold').fontSize(9).text('AMOUNT PAID', 420, y + 14, { width: 120, align: 'right' });
+  doc.fillColor('#065f46').font('Helvetica-Bold').fontSize(8.5).text('FIXED AMOUNT PAID', 400, y + 14, { width: 140, align: 'right' });
   doc.fillColor('#047857').font('Helvetica-Bold').fontSize(22).text(`Rs. ${data.amount.toLocaleString()}`, 380, y + 26, { width: 160, align: 'right' });
 
   // Amount in words

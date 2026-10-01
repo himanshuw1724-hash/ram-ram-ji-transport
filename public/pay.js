@@ -869,6 +869,12 @@ function populatePaymentStep(data) {
     if (document.getElementById('btnCopyFeeAmount')) {
       document.getElementById('btnCopyFeeAmount').textContent = formattedAmount;
     }
+    if (document.getElementById('fixedNoticeAmountDisplay')) {
+      document.getElementById('fixedNoticeAmountDisplay').textContent = formattedAmount;
+    }
+    if (document.getElementById('formLockedAmountDisplay')) {
+      document.getElementById('formLockedAmountDisplay').textContent = formattedAmount;
+    }
 
     // Populate Official Bank Account Details
     const bName = data.settings?.bankName || 'YES Bank';
