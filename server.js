@@ -435,10 +435,10 @@ app.get('/api/pay/:token', async (req, res) => {
         scannerImage: settings.scannerImage || '/scanner.png'
       },
       payment: {
-        upiUri: qrInfo.cleanBankUri,
+        upiUri: qrInfo.dynamicUri,
         cleanBankUri: qrInfo.cleanBankUri,
         dynamicUri: qrInfo.dynamicUri,
-        qrDataUrl: qrInfo.cleanQrDataUrl,
+        qrDataUrl: qrInfo.dynamicQrDataUrl,
         cleanQrDataUrl: qrInfo.cleanQrDataUrl,
         dynamicQrDataUrl: qrInfo.dynamicQrDataUrl,
         scannerImage: settings.scannerImage || '/scanner.png',

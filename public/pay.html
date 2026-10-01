@@ -430,24 +430,27 @@
                 </p>
               </div>
 
-              <!-- 📷 METHOD 2: SCAN OFFICIAL BANK QR CODE -->
+              <!-- 📷 METHOD 2: SCAN FIXED FEE MONTHLY QR CODE -->
               <div class="bg-white p-4 sm:p-5 rounded-3xl border-2 border-emerald-500 shadow-md text-center max-w-[320px] mx-auto space-y-3">
                 <div class="flex items-center justify-between border-b border-slate-100 pb-1.5">
                   <span class="text-xs font-black text-slate-800 flex items-center gap-1">
-                    <span>📷</span> Option B: Scan Official QR
+                    <span>📷</span> Fixed Fee Scanner
                   </span>
-                  <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                    Zero Risk QR
+                  <span id="qrHeaderBadge" class="text-[10px] font-black text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                    🔒 Pre-filled ₹2,310
                   </span>
                 </div>
 
                 <!-- QR Code with verified container -->
-                <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-inner">
-                  <img id="qrImageElement" src="/scanner.png" alt="Official Bank Payment QR Code" class="w-56 h-56 mx-auto object-contain">
+                <div class="bg-white p-2 rounded-2xl border border-slate-200 shadow-inner relative">
+                  <img id="qrImageElement" src="/scanner.png" alt="Official Fixed Fee Payment QR Code" class="w-56 h-56 mx-auto object-contain">
+                  <div class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full whitespace-nowrap shadow-xs">
+                    🔒 Amount Locked: <span id="qrOverlayAmount">₹2,310</span>
+                  </div>
                 </div>
 
                 <!-- Official Bank Payee Verification -->
-                <div class="space-y-1 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80 text-left">
+                <div class="space-y-1 bg-emerald-50/80 p-2.5 rounded-xl border border-emerald-200 text-left">
                   <div class="text-xs font-black text-slate-900 flex items-center justify-between">
                     <span>Payee: HIMANSHU  WALIA</span>
                     <span class="w-4 h-4 rounded-full bg-emerald-500 text-white text-[10px] flex items-center justify-center font-black" title="Verified by YES Bank">✓</span>
@@ -455,8 +458,8 @@
                   <div class="text-xs font-mono font-bold text-slate-700">
                     himanshu1461@ptyes
                   </div>
-                  <div class="text-[10px] text-emerald-800 font-bold" id="qrAmountHint">
-                    ✓ Official Bank Scanner. Zero risk flags when scanned.
+                  <div class="text-[10px] text-emerald-900 font-bold" id="qrAmountHint">
+                    🔒 Fixed Monthly Fee is automatically pre-filled when scanned.
                   </div>
                 </div>
 

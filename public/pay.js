@@ -948,31 +948,37 @@ function copyMobileNumber() {
   });
 }
 
-let currentQrMode = 'clean';
+let currentQrMode = 'fixed';
 
-function switchQrMode(mode = 'clean') {
+function switchQrMode(mode = 'fixed') {
   currentQrMode = mode;
   const qrImg = document.getElementById('qrImageElement');
   const qrHint = document.getElementById('qrAmountHint');
+  const overlayAmt = document.getElementById('qrOverlayAmount');
+  const qrHeaderBadge = document.getElementById('qrHeaderBadge');
 
   if (!activeStudentData || !activeStudentData.payment) return;
 
   const payment = activeStudentData.payment;
   const settings = activeStudentData.settings || {};
-  const customScanner = settings.scannerImage || payment.scannerImage;
-  const hasCustomScanner = payment.useCustomQr || (customScanner && customScanner !== '/scanner.png');
+  const isClubbed = activeStudentData.isClubbed && activeStudentData.studentsInPayment && activeStudentData.studentsInPayment.length > 1;
+  const currentTotal = isClubbed ? activeStudentData.totalAmount : activeStudentData.amount;
+  const sym = settings.currencySymbol || '₹';
+  const formattedAmount = `${sym}${Number(currentTotal).toLocaleString()}`;
+
+  if (overlayAmt) overlayAmt.textContent = formattedAmount;
+  if (qrHeaderBadge) qrHeaderBadge.textContent = `🔒 Pre-filled ${formattedAmount}`;
 
   if (qrImg) {
-    if (hasCustomScanner && customScanner) {
-      qrImg.src = customScanner;
+    if (mode === 'custom' && settings.scannerImage && settings.scannerImage !== '/scanner.png') {
+      qrImg.src = settings.scannerImage;
     } else {
-      qrImg.src = payment.cleanQrDataUrl || customScanner || '/scanner.png';
+      // DEFAULT: Strictly Fixed Fee QR with pre-filled amount!
+      qrImg.src = payment.dynamicQrDataUrl || payment.qrDataUrl || payment.cleanQrDataUrl || '/scanner.png';
     }
   }
   if (qrHint) {
-    qrHint.textContent = hasCustomScanner
-      ? '✓ Official Payment Scanner. Scan with Google Pay, PhonePe, Paytm, or BHIM.'
-      : '✓ Official Bank Scanner. Zero risk flags in Paytm / PhonePe / GPay.';
+    qrHint.innerHTML = `<span>🔒 <strong>Fixed Fee Scanner (${formattedAmount} Pre-filled):</strong> Scan with Google Pay, PhonePe, Paytm, or BHIM. Amount ${formattedAmount} is pre-set automatically.</span>`;
   }
   updateMobileAppLinks();
 }
@@ -981,10 +987,14 @@ function updateMobileAppLinks() {
   if (!activeStudentData || !activeStudentData.payment) return;
   const upiId = activeStudentData.payment.upiId || 'himanshu1461@ptyes';
   const payee = activeStudentData.payment.payeeName || 'HIMANSHU  WALIA';
+  const isClubbed = activeStudentData.isClubbed && activeStudentData.studentsInPayment && activeStudentData.studentsInPayment.length > 1;
+  const currentTotal = isClubbed ? activeStudentData.totalAmount : activeStudentData.amount;
+  const cleanAmount = Number(currentTotal || 0).toFixed(2);
+  const targetMonth = (activeStudentData.dueDetails && activeStudentData.dueDetails.targetMonth) || activeStudentData.billingPeriod || 'September 2026';
+  const note = `Bus Fee ${activeStudentData.name} ${targetMonth}`.replace(/[^a-zA-Z0-9 -]/g, ' ').substring(0, 50);
 
-  // Always pass clean verified VPA and Payee Name without external amount query string,
-  // preventing Paytm Protect from triggering "UPI Risk Policy" alert.
-  const uri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payee)}`;
+  // Dynamic URI with FIXED FEE AMOUNT pre-filled
+  const uri = activeStudentData.payment.dynamicUri || `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(payee)}&am=${cleanAmount}&cu=INR&tn=${encodeURIComponent(note)}`;
 
   const linkPhonePe = document.getElementById('linkPhonePe');
   const linkGPay = document.getElementById('linkGPay');
